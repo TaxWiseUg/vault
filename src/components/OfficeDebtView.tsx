@@ -534,7 +534,7 @@ Logs Recorded: ${payments.length} installments`;
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-widest flex items-center gap-1.5">
+            <span className="text-xs font-bold text-lime-600 dark:text-lime-400 uppercase tracking-widest flex items-center gap-1.5">
               <Landmark className="w-3.5 h-3.5" />
               Office Debt Payoff Commitment
             </span>
@@ -543,7 +543,7 @@ Logs Recorded: ${payments.length} installments`;
             Office Debt (720k)
           </h1>
           <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
-            Mandatory daily installments of at least <strong className="text-amber-600 dark:text-amber-400">{formatUGX(dailyMin)}/day</strong> until fully cleared.
+            Mandatory daily installments of at least <strong className="text-lime-600 dark:text-lime-400">{formatUGX(dailyMin)}/day</strong> until fully cleared.
           </p>
         </div>
 
@@ -554,7 +554,7 @@ Logs Recorded: ${payments.length} installments`;
             className="flex items-center gap-1.5 px-3 py-2 rounded-surface text-xs font-bold bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors "
             title="Copy payoff report to clipboard"
           >
-            {copiedText ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5 text-zinc-400" />}
+            {copiedText ? <Check className="w-3.5 h-3.5 text-lime-500" /> : <Copy className="w-3.5 h-3.5 text-zinc-400" />}
             <span>{copiedText ? 'Copied' : 'Share Report'}</span>
           </button>
 
@@ -575,9 +575,9 @@ Logs Recorded: ${payments.length} installments`;
       </div>
 
       {/* Main Metric Hero Card */}
-      <div className="bg-white dark:bg-zinc-900 rounded-surface sm:rounded-surface p-6 sm:p-8  border border-amber-200/70 dark:border-amber-900/40 relative overflow-hidden transition-colors">
+      <div className="bg-white dark:bg-zinc-900 rounded-surface sm:rounded-surface p-6 sm:p-8  border border-lime-200/70 dark:border-lime-900/40 relative overflow-hidden transition-colors">
         {/* Subtle decorative background glow */}
-        <div className="absolute -right-16 -top-16 w-56 h-56 rounded-full bg-amber-500/10 dark:bg-amber-500/5 blur-3xl pointer-events-none" />
+        <div className="absolute -right-16 -top-16 w-56 h-56 rounded-full bg-lime-500/10 dark:bg-lime-500/5 blur-3xl pointer-events-none" />
 
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-6 border-b border-zinc-100 dark:border-zinc-800">
           <div className="space-y-1">
@@ -599,11 +599,11 @@ Logs Recorded: ${payments.length} installments`;
               <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">
                 Total Paid Off
               </span>
-              <span className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono-num">
+              <span className="text-xl sm:text-2xl font-black text-lime-600 dark:text-lime-400 font-mono-num">
                 {formatUGX(totalPaid)}
               </span>
             </div>
-            <div className="w-14 h-14 rounded-surface bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-900/60 text-amber-600 dark:text-amber-400 flex flex-col items-center justify-center font-mono-num font-black text-sm shrink-0">
+            <div className="w-14 h-14 rounded-surface bg-lime-50 dark:bg-lime-950/60 border border-lime-200 dark:border-lime-900/60 text-lime-600 dark:text-lime-400 flex flex-col items-center justify-center font-mono-num font-black text-sm shrink-0">
               <span>{progressPct}%</span>
               <span className="text-xs font-bold uppercase tracking-tighter opacity-70">Paid</span>
             </div>
@@ -614,7 +614,7 @@ Logs Recorded: ${payments.length} installments`;
         <div className="mt-6 space-y-2">
           <div className="flex justify-between items-center text-xs font-bold">
             <span className="text-zinc-500 dark:text-zinc-400">Payoff Completion</span>
-            <span className="font-mono-num text-amber-700 dark:text-amber-400">
+            <span className="font-mono-num text-lime-700 dark:text-lime-400">
               {formatUGX(totalPaid)} / {formatUGX(totalDebt)}
             </span>
           </div>
@@ -631,13 +631,13 @@ Logs Recorded: ${payments.length} installments`;
           {/* Today's Quota Badge */}
           <div className={`p-3.5 rounded-surface border transition-colors flex items-center gap-3 ${
             isTodayCompleted
-              ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-900/60 text-emerald-900 dark:text-emerald-200'
-              : 'bg-amber-50/80 dark:bg-amber-950/30 border-amber-200 dark:border-amber-900/50 text-amber-900 dark:text-amber-200'
+              ? 'bg-lime-50 dark:bg-lime-950/40 border-lime-200 dark:border-lime-900/60 text-lime-900 dark:text-lime-200'
+              : 'bg-lime-50/80 dark:bg-lime-950/30 border-lime-200 dark:border-lime-900/50 text-lime-900 dark:text-lime-200'
           }`}>
             <div className={`w-9 h-9 rounded-surface flex items-center justify-center shrink-0 ${
               isTodayCompleted
-                ? 'bg-emerald-600 text-white'
-                : 'bg-amber-500 text-white'
+                ? 'bg-lime-600 text-white'
+                : 'bg-lime-500 text-white'
             }`}>
               {isTodayCompleted ? <CheckCircle2 className="w-5 h-5" /> : <Calendar className="w-5 h-5" />}
             </div>
@@ -647,11 +647,11 @@ Logs Recorded: ${payments.length} installments`;
               </span>
               <div className="text-xs font-black">
                 {isTodayCompleted ? (
-                  <span className="text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
+                  <span className="text-lime-700 dark:text-lime-400 flex items-center gap-1">
                     {formatUGX(todayPaidSum)} paid today ✓
                   </span>
                 ) : (
-                  <span className="text-amber-800 dark:text-amber-300">
+                  <span className="text-lime-800 dark:text-lime-300">
                     {formatUGX(todayPaidSum)} / {formatUGX(dailyMin)} ({formatUGX(todayRemainingForMin)} left)
                   </span>
                 )}
@@ -661,7 +661,7 @@ Logs Recorded: ${payments.length} installments`;
 
           {/* Daily Streak */}
           <div className="p-3.5 rounded-surface bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/60 dark:border-zinc-800 flex items-center gap-3">
-            <div className="w-9 h-9 rounded-surface bg-orange-500 text-white flex items-center justify-center shrink-0 ">
+            <div className="w-9 h-9 rounded-surface bg-lime-500 text-white flex items-center justify-center shrink-0 ">
               <Flame className="w-5 h-5" />
             </div>
             <div>
@@ -676,7 +676,7 @@ Logs Recorded: ${payments.length} installments`;
 
           {/* Projected Clearance Date */}
           <div className="p-3.5 rounded-surface bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/60 dark:border-zinc-800 flex items-center gap-3">
-            <div className="w-9 h-9 rounded-surface bg-indigo-600 text-white flex items-center justify-center shrink-0 ">
+            <div className="w-9 h-9 rounded-surface bg-lime-600 text-white flex items-center justify-center shrink-0 ">
               <CalendarCheck className="w-5 h-5" />
             </div>
             <div>
@@ -696,15 +696,15 @@ Logs Recorded: ${payments.length} installments`;
         <div className="bg-zinc-900 text-white rounded-surface p-5 sm:p-7 shadow-floating border border-zinc-800 relative overflow-hidden">
 
           {/* Calculator Header & Pattern Overview */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-indigo-900/70">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-lime-900/70">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-surface bg-amber-500/20 border border-amber-400/40 text-amber-400 flex items-center justify-center shrink-0">
+              <div className="w-8 h-8 rounded-surface bg-lime-500/20 border border-lime-400/40 text-lime-400 flex items-center justify-center shrink-0">
                 <Zap className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="text-sm font-bold uppercase tracking-wider text-amber-400 flex items-center gap-2">
+                <h3 className="text-sm font-bold uppercase tracking-wider text-lime-400 flex items-center gap-2">
                   <span>Payoff Speed Calculator</span>
-                  <span className="text-xs px-2 py-0.5 rounded-full font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                  <span className="text-xs px-2 py-0.5 rounded-full font-bold bg-lime-400/20 text-lime-300 border border-lime-400/30">
                     Dynamic
                   </span>
                 </h3>
@@ -716,24 +716,24 @@ Logs Recorded: ${payments.length} installments`;
 
             {/* Current Pattern Badge */}
             <div className="flex items-center gap-2 self-start sm:self-auto bg-zinc-800/80 border border-zinc-700/80 px-3 py-1.5 rounded-surface text-xs">
-              <BarChart3 className="w-3.5 h-3.5 text-amber-400" />
+              <BarChart3 className="w-3.5 h-3.5 text-lime-400" />
               <span className="text-zinc-300">Active Velocity:</span>
-              <strong className="text-amber-300 font-mono-num">
+              <strong className="text-lime-300 font-mono-num">
                 ~{formatUGX(activeDailyVelocity)}/day
               </strong>
             </div>
           </div>
 
           {/* Dynamic Countdown Display (Years, Months, Days) */}
-          <div className="my-5 p-4 sm:p-5 rounded-surface bg-zinc-950/70 border border-indigo-800/50">
-            <span className="text-xs font-bold uppercase tracking-wider text-indigo-300 block mb-3">
+          <div className="my-5 p-4 sm:p-5 rounded-surface bg-zinc-950/70 border border-lime-800/50">
+            <span className="text-xs font-bold uppercase tracking-wider text-lime-300 block mb-3">
               Remaining Payoff Duration ({calculatorMode === 'pattern' ? patternAnalysis.paceLabel : `${formatUGX(activeDailyVelocity)}/day`})
             </span>
 
             <div className="grid grid-cols-3 gap-2.5 sm:gap-4 text-center">
               {/* Years */}
-              <div className="bg-zinc-900/90 border border-indigo-900/70 rounded-surface p-3 sm:p-4">
-                <div className="text-2xl sm:text-4xl font-black text-amber-400 font-mono-num">
+              <div className="bg-zinc-900/90 border border-lime-900/70 rounded-surface p-3 sm:p-4">
+                <div className="text-2xl sm:text-4xl font-black text-lime-400 font-mono-num">
                   {currentPayoffEstimate.years}
                 </div>
                 <div className="text-xs sm:text-xs font-bold uppercase tracking-wider text-zinc-400 mt-1">
@@ -742,8 +742,8 @@ Logs Recorded: ${payments.length} installments`;
               </div>
 
               {/* Months */}
-              <div className="bg-zinc-900/90 border border-indigo-900/70 rounded-surface p-3 sm:p-4">
-                <div className="text-2xl sm:text-4xl font-black text-amber-300 font-mono-num">
+              <div className="bg-zinc-900/90 border border-lime-900/70 rounded-surface p-3 sm:p-4">
+                <div className="text-2xl sm:text-4xl font-black text-lime-300 font-mono-num">
                   {currentPayoffEstimate.months}
                 </div>
                 <div className="text-xs sm:text-xs font-bold uppercase tracking-wider text-zinc-400 mt-1">
@@ -752,8 +752,8 @@ Logs Recorded: ${payments.length} installments`;
               </div>
 
               {/* Days */}
-              <div className="bg-zinc-900/90 border border-indigo-900/70 rounded-surface p-3 sm:p-4">
-                <div className="text-2xl sm:text-4xl font-black text-emerald-400 font-mono-num">
+              <div className="bg-zinc-900/90 border border-lime-900/70 rounded-surface p-3 sm:p-4">
+                <div className="text-2xl sm:text-4xl font-black text-lime-400 font-mono-num">
                   {currentPayoffEstimate.days}
                 </div>
                 <div className="text-xs sm:text-xs font-bold uppercase tracking-wider text-zinc-400 mt-1">
@@ -768,9 +768,9 @@ Logs Recorded: ${payments.length} installments`;
                 Total Remaining: <strong className="text-white font-mono-num">~{currentPayoffEstimate.totalDays} days</strong> ({currentPayoffEstimate.breakdownText})
               </div>
               <div className="text-zinc-300 flex items-center gap-1.5">
-                <CalendarDays className="w-3.5 h-3.5 text-amber-400" />
+                <CalendarDays className="w-3.5 h-3.5 text-lime-400" />
                 <span>Projected Completion:</span>
-                <strong className="text-amber-300">{currentPayoffEstimate.finishDate}</strong>
+                <strong className="text-lime-300">{currentPayoffEstimate.finishDate}</strong>
               </div>
             </div>
           </div>
@@ -782,7 +782,7 @@ Logs Recorded: ${payments.length} installments`;
                 Compare Payoff Paces:
               </span>
               {patternAnalysis.hasHistory && (
-                <span className="text-xs text-amber-400">
+                <span className="text-xs text-lime-400">
                   {patternAnalysis.totalDepositCount} past deposits analyzed
                 </span>
               )}
@@ -797,7 +797,7 @@ Logs Recorded: ${payments.length} installments`;
                 onClick={() => setCalculatorMode('pattern')}
                 className={`p-2.5 rounded-surface font-bold border transition-all text-left ${
                   calculatorMode === 'pattern'
-                    ? 'bg-amber-500 text-zinc-950 border-amber-400 '
+                    ? 'bg-lime-500 text-zinc-950 border-lime-400 '
                     : 'bg-zinc-800/80 hover:bg-zinc-700/80 text-zinc-300 border-zinc-700/80'
                 }`}
               >
@@ -821,7 +821,7 @@ Logs Recorded: ${payments.length} installments`;
                 onClick={() => setCalculatorMode('minimum')}
                 className={`p-2.5 rounded-surface font-bold border transition-all text-left ${
                   calculatorMode === 'minimum'
-                    ? 'bg-indigo-600 text-white border-indigo-400 '
+                    ? 'bg-lime-600 text-white border-lime-400 '
                     : 'bg-zinc-800/80 hover:bg-zinc-700/80 text-zinc-300 border-zinc-700/80'
                 }`}
               >
@@ -845,7 +845,7 @@ Logs Recorded: ${payments.length} installments`;
                 onClick={() => setCalculatorMode('moderate')}
                 className={`p-2.5 rounded-surface font-bold border transition-all text-left ${
                   calculatorMode === 'moderate'
-                    ? 'bg-indigo-600 text-white border-indigo-400 '
+                    ? 'bg-lime-600 text-white border-lime-400 '
                     : 'bg-zinc-800/80 hover:bg-zinc-700/80 text-zinc-300 border-zinc-700/80'
                 }`}
               >
@@ -869,7 +869,7 @@ Logs Recorded: ${payments.length} installments`;
                 onClick={() => setCalculatorMode('turbo')}
                 className={`p-2.5 rounded-surface font-bold border transition-all text-left ${
                   calculatorMode === 'turbo'
-                    ? 'bg-emerald-600 text-white border-emerald-400 '
+                    ? 'bg-lime-600 text-white border-lime-400 '
                     : 'bg-zinc-800/80 hover:bg-zinc-700/80 text-zinc-300 border-zinc-700/80'
                 }`}
               >
@@ -893,7 +893,7 @@ Logs Recorded: ${payments.length} installments`;
                 onClick={() => setCalculatorMode('custom')}
                 className={`p-2.5 rounded-surface font-bold border transition-all text-left col-span-2 sm:col-span-1 ${
                   calculatorMode === 'custom'
-                    ? 'bg-amber-500 text-zinc-950 border-amber-400 '
+                    ? 'bg-lime-500 text-zinc-950 border-lime-400 '
                     : 'bg-zinc-800/80 hover:bg-zinc-700/80 text-zinc-300 border-zinc-700/80'
                 }`}
               >
@@ -923,7 +923,7 @@ Logs Recorded: ${payments.length} installments`;
                   <div className="mt-3 p-3 rounded-surface bg-zinc-950/60 border border-zinc-800 space-y-2">
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-zinc-400">Slide to test daily payment capability:</span>
-                      <span className="font-mono-num font-black text-amber-400">{formatUGX(customPace)} / day</span>
+                      <span className="font-mono-num font-black text-lime-400">{formatUGX(customPace)} / day</span>
                     </div>
                     <input
                       type="range"
@@ -932,7 +932,7 @@ Logs Recorded: ${payments.length} installments`;
                       step={500}
                       value={customPace}
                       onChange={(e) => setCustomPace(parseInt(e.target.value, 10))}
-                      className="w-full accent-amber-500 cursor-pointer"
+                      className="w-full accent-lime-500 cursor-pointer"
                     />
                     <div className="flex justify-between text-xs text-zinc-500 font-mono">
                       <span>1,000 UGX</span>
@@ -947,17 +947,17 @@ Logs Recorded: ${payments.length} installments`;
 
           {/* Dynamic Velocity Insights Callout */}
           <div className="mt-4 p-3 rounded-surface bg-zinc-800/50 border border-zinc-700/60 text-xs text-zinc-300 flex items-start gap-2.5">
-            <Info className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+            <Info className="w-4 h-4 text-lime-400 shrink-0 mt-0.5" />
             <div className="space-y-1">
               <p>
                 <strong>{patternAnalysis.paceLabel}:</strong> {patternAnalysis.paceDescription}
               </p>
               {patternAnalysis.dailyPace > dailyMin ? (
-                <p className="text-emerald-300 font-medium">
+                <p className="text-lime-300 font-medium">
                   Your actual deposit velocity will clear this debt ~<strong>{Math.max(0, minPacePayoffEstimate.totalDays - patternPayoffEstimate.totalDays)} days earlier</strong> than the minimum quota!
                 </p>
               ) : patternAnalysis.hasHistory ? (
-                <p className="text-amber-200">
+                <p className="text-lime-200">
                   Tip: Increasing your daily deposit to 5,000 UGX/day would cut your payoff duration down to <strong>{formatPayoffDuration(5000, remaining).breakdownText}</strong>.
                 </p>
               ) : null}
@@ -969,7 +969,7 @@ Logs Recorded: ${payments.length} installments`;
       {/* Log Payment Quick Action Form */}
       <div className="bg-white dark:bg-zinc-900 rounded-surface sm:rounded-surface p-6 sm:p-8  border border-zinc-100 dark:border-zinc-800 transition-colors">
         <div className="flex items-center gap-3 pb-5 border-b border-zinc-100 dark:border-zinc-800">
-          <div className="w-12 h-12 rounded-surface bg-amber-500 text-white flex items-center justify-center  shrink-0">
+          <div className="w-12 h-12 rounded-surface bg-lime-500 text-white flex items-center justify-center  shrink-0">
             <Receipt className="w-6 h-6" />
           </div>
           <div>
@@ -1000,7 +1000,7 @@ Logs Recorded: ${payments.length} installments`;
                     onClick={() => setQuickAmount(amt.toString())}
                     className={`py-2.5 px-2 rounded-surface text-xs font-bold transition-all border text-center ${
                       isSelected
-                        ? 'bg-amber-500 text-white border-amber-600 '
+                        ? 'bg-lime-500 text-white border-lime-600 '
                         : 'bg-zinc-50 dark:bg-zinc-800/80 border-zinc-200 dark:border-zinc-700/80 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                     }`}
                   >
@@ -1022,7 +1022,7 @@ Logs Recorded: ${payments.length} installments`;
                 value={quickAmount}
                 onChange={(e) => setQuickAmount(e.target.value)}
                 placeholder="2,000"
-                className="w-full bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/80 rounded-surface pl-16 pr-4 py-3.5 text-zinc-900 dark:text-white font-mono text-base font-bold outline-none focus:ring-2 focus:ring-amber-500"
+                className="w-full bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/80 rounded-surface pl-16 pr-4 py-3.5 text-zinc-900 dark:text-white font-mono text-base font-bold outline-none focus:ring-2 focus:ring-lime-500"
               />
             </div>
           </div>
@@ -1037,7 +1037,7 @@ Logs Recorded: ${payments.length} installments`;
                 id="debt-payment-method-select"
                 value={selectedMethod}
                 onChange={(e) => setSelectedMethod(e.target.value as PaymentMethod)}
-                className="w-full bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/80 rounded-surface px-4 py-3 text-zinc-900 dark:text-white font-bold text-xs outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer"
+                className="w-full bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/80 rounded-surface px-4 py-3 text-zinc-900 dark:text-white font-bold text-xs outline-none focus:ring-2 focus:ring-lime-500 cursor-pointer"
               >
                 {PAYMENT_METHODS.map((m) => (
                   <option key={m.id} value={m.id}>
@@ -1057,7 +1057,7 @@ Logs Recorded: ${payments.length} installments`;
                 type="date"
                 value={paymentDate}
                 onChange={(e) => setPaymentDate(e.target.value)}
-                className="w-full bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/80 rounded-surface px-4 py-3 text-zinc-900 dark:text-white font-mono text-xs font-bold outline-none focus:ring-2 focus:ring-amber-500"
+                className="w-full bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/80 rounded-surface px-4 py-3 text-zinc-900 dark:text-white font-mono text-xs font-bold outline-none focus:ring-2 focus:ring-lime-500"
               />
             </div>
           </div>
@@ -1073,7 +1073,7 @@ Logs Recorded: ${payments.length} installments`;
               value={paymentNote}
               onChange={(e) => setPaymentNote(e.target.value)}
               placeholder="e.g. Daily office debt installment, Cash payment"
-              className="w-full bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/80 rounded-surface px-4 py-3 text-zinc-900 dark:text-white text-xs outline-none focus:ring-2 focus:ring-amber-500"
+              className="w-full bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/80 rounded-surface px-4 py-3 text-zinc-900 dark:text-white text-xs outline-none focus:ring-2 focus:ring-lime-500"
             />
           </div>
 
@@ -1083,7 +1083,7 @@ Logs Recorded: ${payments.length} installments`;
             id="debt-save-payment-submit-btn"
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-amber-500 hover:bg-amber-600 active:scale-[0.99] text-white py-3.5 rounded-surface font-black text-sm uppercase tracking-wider  transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+            className="w-full bg-lime-500 hover:bg-lime-600 active:scale-[0.99] text-white py-3.5 rounded-surface font-black text-sm uppercase tracking-wider  transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
           >
             <CheckCircle2 className="w-5 h-5" />
             <span>Record Debt Payment</span>
@@ -1112,7 +1112,7 @@ Logs Recorded: ${payments.length} installments`;
               <button
                 type="button"
                 onClick={toggleAllGroups}
-                className="text-xs font-bold text-zinc-500 dark:text-zinc-400 hover:text-amber-600 dark:hover:text-amber-400 transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-surface bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700"
+                className="text-xs font-bold text-zinc-500 dark:text-zinc-400 hover:text-lime-600 dark:hover:text-lime-400 transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-surface bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700"
               >
                 <Layers className="w-3.5 h-3.5" />
                 <span>
@@ -1181,7 +1181,7 @@ Logs Recorded: ${payments.length} installments`;
                       <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-zinc-200/70 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300">
                         {group.count} {group.count === 1 ? 'installment' : 'installments'}
                       </span>
-                      <span className="text-xs sm:text-sm font-black font-mono-num text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-900/60 px-2.5 py-0.5 rounded-full">
+                      <span className="text-xs sm:text-sm font-black font-mono-num text-lime-600 dark:text-lime-400 bg-lime-50 dark:bg-lime-950/60 border border-lime-200 dark:border-lime-900/60 px-2.5 py-0.5 rounded-full">
                         +{formatUGX(group.totalAmount)}
                       </span>
                     </div>
@@ -1208,7 +1208,7 @@ Logs Recorded: ${payments.length} installments`;
                                 className="p-3 sm:p-4 flex items-center justify-between gap-3 hover:bg-zinc-50/70 dark:hover:bg-zinc-800/40 transition-colors"
                               >
                                 <div className="flex items-center gap-3 min-w-0">
-                                  <div className="w-9 h-9 rounded-surface bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-900/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                                  <div className="w-9 h-9 rounded-surface bg-lime-50 dark:bg-lime-950/60 border border-lime-200 dark:border-lime-900/60 text-lime-600 dark:text-lime-400 flex items-center justify-center shrink-0">
                                     <TrendingDown className="w-4 h-4" />
                                   </div>
 
@@ -1232,7 +1232,7 @@ Logs Recorded: ${payments.length} installments`;
                                 </div>
 
                                 <div className="flex items-center gap-3 shrink-0">
-                                  <span className="text-xs sm:text-sm font-black font-mono-num text-emerald-600 dark:text-emerald-400">
+                                  <span className="text-xs sm:text-sm font-black font-mono-num text-lime-600 dark:text-lime-400">
                                     +{formatUGX(p.amount)}
                                   </span>
 
@@ -1293,7 +1293,7 @@ Logs Recorded: ${payments.length} installments`;
                     type="text"
                     value={editAmount}
                     onChange={(e) => setEditAmount(e.target.value)}
-                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-surface px-4 py-2.5 text-zinc-900 dark:text-white font-mono font-bold text-sm outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-surface px-4 py-2.5 text-zinc-900 dark:text-white font-mono font-bold text-sm outline-none focus:ring-2 focus:ring-lime-500"
                   />
                 </div>
 
@@ -1303,7 +1303,7 @@ Logs Recorded: ${payments.length} installments`;
                     type="date"
                     value={editDate}
                     onChange={(e) => setEditDate(e.target.value)}
-                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-surface px-4 py-2.5 text-zinc-900 dark:text-white font-mono text-xs font-bold outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-surface px-4 py-2.5 text-zinc-900 dark:text-white font-mono text-xs font-bold outline-none focus:ring-2 focus:ring-lime-500"
                   />
                 </div>
 
@@ -1312,7 +1312,7 @@ Logs Recorded: ${payments.length} installments`;
                   <select
                     value={editMethod}
                     onChange={(e) => setEditMethod(e.target.value as PaymentMethod)}
-                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-surface px-4 py-2.5 text-zinc-900 dark:text-white text-xs font-bold outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-surface px-4 py-2.5 text-zinc-900 dark:text-white text-xs font-bold outline-none focus:ring-2 focus:ring-lime-500"
                   >
                     {PAYMENT_METHODS.map((m) => (
                       <option key={m.id} value={m.id}>
@@ -1328,7 +1328,7 @@ Logs Recorded: ${payments.length} installments`;
                     type="text"
                     value={editNote}
                     onChange={(e) => setEditNote(e.target.value)}
-                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-surface px-4 py-2.5 text-zinc-900 dark:text-white text-xs outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-surface px-4 py-2.5 text-zinc-900 dark:text-white text-xs outline-none focus:ring-2 focus:ring-lime-500"
                   />
                 </div>
 
@@ -1342,7 +1342,7 @@ Logs Recorded: ${payments.length} installments`;
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 py-2.5 rounded-surface font-bold text-xs bg-amber-500 text-white "
+                    className="flex-1 py-2.5 rounded-surface font-bold text-xs bg-lime-500 text-white "
                   >
                     Save Changes
                   </button>
@@ -1416,7 +1416,7 @@ Logs Recorded: ${payments.length} installments`;
               transition={{ duration: 0.18, ease: 'easeOut' }}
               className="bg-white dark:bg-zinc-900 rounded-surface p-6 max-w-sm w-full shadow-floating border border-zinc-100 dark:border-zinc-800 space-y-4 text-center"
             >
-              <div className="w-12 h-12 rounded-surface bg-amber-100 dark:bg-amber-950 text-amber-600 mx-auto flex items-center justify-center">
+              <div className="w-12 h-12 rounded-surface bg-lime-100 dark:bg-lime-950 text-lime-600 mx-auto flex items-center justify-center">
                 <RefreshCw className="w-6 h-6" />
               </div>
               <div>
@@ -1461,7 +1461,7 @@ Logs Recorded: ${payments.length} installments`;
                   type="text"
                   value={configTotal}
                   onChange={(e) => setConfigTotal(e.target.value)}
-                  className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-surface px-4 py-2.5 text-zinc-900 dark:text-white font-mono font-bold text-sm outline-none focus:ring-2 focus:ring-amber-500"
+                  className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-surface px-4 py-2.5 text-zinc-900 dark:text-white font-mono font-bold text-sm outline-none focus:ring-2 focus:ring-lime-500"
                 />
               </div>
 
@@ -1471,7 +1471,7 @@ Logs Recorded: ${payments.length} installments`;
                   type="text"
                   value={configDailyMin}
                   onChange={(e) => setConfigDailyMin(e.target.value)}
-                  className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-surface px-4 py-2.5 text-zinc-900 dark:text-white font-mono font-bold text-sm outline-none focus:ring-2 focus:ring-amber-500"
+                  className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-surface px-4 py-2.5 text-zinc-900 dark:text-white font-mono font-bold text-sm outline-none focus:ring-2 focus:ring-lime-500"
                 />
               </div>
 
@@ -1482,7 +1482,7 @@ Logs Recorded: ${payments.length} installments`;
                   value={configCreditor}
                   onChange={(e) => setConfigCreditor(e.target.value)}
                   placeholder="e.g. Office Space Landlord"
-                  className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-surface px-4 py-2.5 text-zinc-900 dark:text-white text-xs outline-none focus:ring-2 focus:ring-amber-500"
+                  className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-surface px-4 py-2.5 text-zinc-900 dark:text-white text-xs outline-none focus:ring-2 focus:ring-lime-500"
                 />
               </div>
 
@@ -1496,7 +1496,7 @@ Logs Recorded: ${payments.length} installments`;
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 rounded-surface font-bold text-xs bg-amber-500 text-white "
+                  className="flex-1 py-2.5 rounded-surface font-bold text-xs bg-lime-500 text-white "
                 >
                   Save Settings
                 </button>
