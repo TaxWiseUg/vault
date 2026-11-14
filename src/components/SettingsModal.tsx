@@ -47,6 +47,7 @@ interface SettingsModalProps {
   entries: SavingsEntry[];
   onAccountDeleted?: () => void;
   onOpenShortcuts: () => void;
+  standalone?: boolean;
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -57,8 +58,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   entries,
   onAccountDeleted,
   onOpenShortcuts,
+  standalone = false,
 }) => {
-  useLockBodyScroll(isOpen);
+  useLockBodyScroll(isOpen && !standalone);
 
   const { themeMode, resolvedTheme, setThemeMode } = useTheme();
   const [isSyncing, setIsSyncing] = useState(false);
@@ -241,19 +243,19 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-zinc-900/60 dark:bg-black/75 p-0 sm:p-4 animate-in fade-in duration-200"
+      className={standalone ? "mx-auto w-full max-w-5xl px-4 py-6 sm:px-6" : "fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-zinc-900/60 dark:bg-black/75 p-0 sm:p-4 animate-in fade-in duration-200"}
       onMouseDown={(e) => {
-        if (e.target === e.currentTarget) onClose();
+        if (!standalone && e.target === e.currentTarget) onClose();
       }}
       onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
+        if (!standalone && e.target === e.currentTarget) onClose();
       }}
     >
       <div
         id="settings-modal"
         onMouseDown={(e) => e.stopPropagation()}
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-lg bg-white dark:bg-zinc-900 rounded-surface p-6 sm:p-8 shadow-floating border border-zinc-100 dark:border-zinc-800 space-y-6 max-h-[90vh] overflow-y-auto transition-colors"
+        className={standalone ? "w-full rounded-3xl border border-white/10 bg-white/[0.04] p-5 shadow-floating backdrop-blur-xl sm:p-8 space-y-6 transition-colors" : "w-full max-w-lg bg-white dark:bg-zinc-900 rounded-surface p-6 sm:p-8 shadow-floating border border-zinc-100 dark:border-zinc-800 space-y-6 max-h-[90vh] overflow-y-auto transition-colors"}
       >
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-zinc-100 dark:border-zinc-800">

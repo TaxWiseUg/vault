@@ -48,14 +48,13 @@ import {
 } from './types';
 import { DEFAULT_CATEGORIES, DEFAULT_OFFICE_DEBT, formatUGX } from './lib/constants';
 import { Navbar } from './components/Navbar';
-import { CategoryTabs, ActiveTab } from './components/CategoryTabs';
+import { ActiveTab } from './components/CategoryTabs';
 import { FloatingNav } from './components/FloatingNav';
 import { CommandPaletteModal } from './components/CommandPaletteModal';
 import { KeyboardShortcutsModal } from './components/KeyboardShortcutsModal';
 import { OverviewView } from './components/OverviewView';
 import { CategoryDetailView } from './components/CategoryDetailView';
 import { HistoryLedger } from './components/HistoryLedger';
-import { ExpensesView } from './components/ExpensesView';
 import { OfficeDebtView } from './components/OfficeDebtView';
 import { QuickAddModal } from './components/QuickAddModal';
 import { EditEntryModal } from './components/EditEntryModal';
@@ -617,7 +616,7 @@ export default function App() {
       } else if (e.key === '5') {
         setActiveTab('debt');
       } else if (e.key === '6') {
-        setActiveTab('expenses');
+        setActiveTab('overview');
       } else if (e.key === '7') {
         setActiveTab('history');
       }
@@ -646,23 +645,13 @@ export default function App() {
         <Navbar
           user={user}
           activeTab={activeTab}
-          onOpenSettings={() => setIsSettingsOpen(true)}
+          onOpenSettings={() => setActiveTab('settings')}
           onOpenNotifications={() => setIsNotificationOpen(true)}
           onOpenAuth={() => setIsAuthModalOpen(true)}
           onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
         />
 
         {/* Category and debt navigation */}
-        <CategoryTabs
-          activeTab={activeTab}
-          onChangeTab={(tab) => setActiveTab(tab)}
-          categoriesProgress={categoriesProgress}
-          debtProgress={{
-            current: synchronizedDebt.paidAmount,
-            total: synchronizedDebt.totalDebt,
-            pct: Math.min(100, Math.round((synchronizedDebt.paidAmount / (synchronizedDebt.totalDebt || 1)) * 100)),
-          }}
-        />
 
         {/* Toast Notification Banner */}
         <AnimatePresence>
@@ -703,7 +692,7 @@ export default function App() {
                   onQuickAddMultiple={handleQuickAddMultiple}
                   onSelectCategory={(catId) => setActiveTab(catId)}
                   onOpenLedger={() => setActiveTab('history')}
-                  onOpenExpenses={() => setActiveTab('expenses')}
+                  onOpenExpenses={() => setActiveTab('history')}
                   onOpenAddExpense={() => handleOpenAddExpenseModal()}
                   onOpenDebt={() => setActiveTab('debt')}
                   onEditEntry={handleOpenEditModal}
@@ -739,16 +728,16 @@ export default function App() {
                 />
               )}
 
-              {activeTab === 'expenses' && (
-                <ExpensesView
-                  expenses={expenses}
-                  totalSavedMonth={overview.totalSaved}
-                  categories={synchronizedCategories}
-                  onOpenAddExpense={handleOpenAddExpenseModal}
-                  onOpenEditExpense={handleOpenEditExpenseModal}
-                  onDeleteExpense={handleDeleteExpense}
-                />
-              )}
+              {activeTab === 'settings' && <SettingsModal
+                isOpen={true}
+                onClose={() => setActiveTab('overview')}
+                user={user}
+                categories={synchronizedCategories}
+                entries={entries}
+                onAccountDeleted={handleAccountDeleted}
+                onOpenShortcuts={() => setIsShortcutsOpen(true)}
+                standalone
+              />}
 
               {activeTab === 'history' && (
                 <HistoryLedger
@@ -756,6 +745,7 @@ export default function App() {
                   categories={synchronizedCategories}
                   onEditEntry={handleOpenEditModal}
                   onDeleteEntry={handleDeleteEntry}
+                  debtPayments={debtPayments}
                 />
               )}
             </motion.div>
@@ -767,8 +757,6 @@ export default function App() {
       <FloatingNav
         activeTab={activeTab}
         onChangeTab={setActiveTab}
-        onOpenAdd={handleOpenAddModal}
-        onOpenExpense={handleOpenAddExpenseModal}
         overlayOpen={isAnyOverlayOpen}
       />
 
@@ -853,7 +841,7 @@ export default function App() {
         onOpenDeposit={handleOpenAddModal}
         onOpenExpense={handleOpenAddExpenseModal}
         onOpenDebt={() => setActiveTab('debt')}
-        onOpenSettings={() => setIsSettingsOpen(true)}
+        onOpenSettings={() => setActiveTab('settings')}
         onOpenShortcuts={() => setIsShortcutsOpen(true)}
       />
 
