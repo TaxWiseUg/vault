@@ -260,7 +260,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-zinc-100 dark:border-zinc-800">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-surface bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+            <div className="w-11 h-11 rounded-surface bg-lime-50 dark:bg-lime-950/60 text-lime-600 dark:text-lime-400 flex items-center justify-center">
               <Settings className="w-5 h-5 pointer-events-none" />
             </div>
             <div>
@@ -288,7 +288,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
         {/* Sync / Notification Status Banner */}
         {syncStatus && (
-          <div className="p-3.5 rounded-surface bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-900/60 text-indigo-700 dark:text-indigo-300 text-xs font-bold text-center animate-in fade-in">
+          <div className="p-3.5 rounded-surface bg-lime-50 dark:bg-lime-950/60 border border-lime-100 dark:border-lime-900/60 text-lime-700 dark:text-lime-300 text-xs font-bold text-center animate-in fade-in">
             {syncStatus}
           </div>
         )}
@@ -368,8 +368,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <span className="text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
               Cloud Backup & Sync
             </span>
-            <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-              {user ? <Cloud className="w-3.5 h-3.5" /> : <CloudOff className="w-3.5 h-3.5 text-amber-500" />}
+            <span className="text-xs font-semibold text-lime-600 dark:text-lime-400 flex items-center gap-1">
+              {user ? <Cloud className="w-3.5 h-3.5" /> : <CloudOff className="w-3.5 h-3.5 text-lime-500" />}
               <span>{user ? 'Firestore Active' : 'Local Storage'}</span>
             </span>
           </div>
@@ -381,11 +381,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <img
                     src={user.photoURL}
                     alt={user.displayName || 'User'}
-                    className="w-12 h-12 rounded-surface border border-indigo-100 dark:border-indigo-900/60 object-cover "
+                    className="w-12 h-12 rounded-surface border border-lime-100 dark:border-lime-900/60 object-cover "
                     referrerPolicy="no-referrer"
                   />
                 ) : (
-                  <div className="w-12 h-12 rounded-surface bg-indigo-600 text-white font-bold text-lg flex items-center justify-center ">
+                  <div className="w-12 h-12 rounded-surface bg-lime-600 text-white font-bold text-lg flex items-center justify-center ">
                     {user.displayName?.[0]?.toUpperCase() || 'V'}
                   </div>
                 )}
@@ -406,7 +406,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <button
                   onClick={handleManualSync}
                   disabled={isSyncing}
-                  className="flex-1 py-2.5 px-3 rounded-surface bg-zinc-900 hover:bg-zinc-800 dark:bg-indigo-600 dark:hover:bg-indigo-500 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all  active:scale-[0.98]"
+                  className="flex-1 py-2.5 px-3 rounded-surface bg-zinc-900 hover:bg-zinc-800 dark:bg-lime-600 dark:hover:bg-lime-500 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all  active:scale-[0.98]"
                 >
                   <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
                   <span>Sync Now</span>
@@ -457,7 +457,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     id="settings-google-login-btn"
                     onClick={handleGoogleLogin}
                     disabled={isSyncing}
-                    className="w-full py-3.5 px-4 rounded-surface bg-zinc-900 hover:bg-zinc-800 dark:bg-indigo-600 dark:hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-3 transition-all  active:scale-[0.98]"
+                    className="w-full py-3.5 px-4 rounded-surface bg-zinc-900 hover:bg-zinc-800 dark:bg-lime-600 dark:hover:bg-lime-500 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-3 transition-all  active:scale-[0.98]"
                   >
                     <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                       <path
@@ -485,15 +485,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       onClick={() => setAuthMode('email_login')}
                       className="py-2.5 px-3 rounded-surface bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700/80 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-all"
                     >
-                      <Mail className="w-3.5 h-3.5 text-indigo-500" />
+                      <Mail className="w-3.5 h-3.5 text-lime-500" />
                       <span>Use Email</span>
                     </button>
                     <button
                       onClick={handleGuestLogin}
                       disabled={isSyncing}
-                      className="py-2.5 px-3 rounded-surface bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 border border-indigo-100 dark:border-indigo-900 text-indigo-700 dark:text-indigo-300 text-xs font-bold flex items-center justify-center gap-1.5 transition-all"
+                      className="py-2.5 px-3 rounded-surface bg-lime-50 dark:bg-lime-950/60 hover:bg-lime-100 dark:hover:bg-lime-900/60 border border-lime-100 dark:border-lime-900 text-lime-700 dark:text-lime-300 text-xs font-bold flex items-center justify-center gap-1.5 transition-all"
                     >
-                      <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                      <Sparkles className="w-3.5 h-3.5 text-lime-600" />
                       <span>1-Tap Guest</span>
                     </button>
                   </div>
@@ -510,7 +510,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="e.g. Partner Name"
-                        className="w-full px-3.5 py-2.5 rounded-surface border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-indigo-500 outline-none"
+                        className="w-full px-3.5 py-2.5 rounded-surface border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-lime-500 outline-none"
                       />
                     </div>
                   )}
@@ -527,7 +527,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="e.g. partner@example.com"
-                        className="w-full pl-9 pr-3.5 py-2.5 rounded-surface border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-indigo-500 outline-none"
+                        className="w-full pl-9 pr-3.5 py-2.5 rounded-surface border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-lime-500 outline-none"
                       />
                     </div>
                   </div>
@@ -544,7 +544,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="•••••••• (min 6 characters)"
-                        className="w-full pl-9 pr-3.5 py-2.5 rounded-surface border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-indigo-500 outline-none"
+                        className="w-full pl-9 pr-3.5 py-2.5 rounded-surface border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-lime-500 outline-none"
                       />
                     </div>
                   </div>
@@ -552,7 +552,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <button
                     type="submit"
                     disabled={isSyncing}
-                    className="w-full py-3 px-4 rounded-surface bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all  active:scale-[0.98]"
+                    className="w-full py-3 px-4 rounded-surface bg-lime-600 hover:bg-lime-500 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all  active:scale-[0.98]"
                   >
                     <LogIn className="w-4 h-4" />
                     <span>
@@ -569,7 +569,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       <button
                         type="button"
                         onClick={() => setAuthMode('email_register')}
-                        className="text-indigo-600 dark:text-indigo-400 font-bold hover:underline"
+                        className="text-lime-600 dark:text-lime-400 font-bold hover:underline"
                       >
                         New user? Create account
                       </button>
@@ -577,7 +577,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       <button
                         type="button"
                         onClick={() => setAuthMode('email_login')}
-                        className="text-indigo-600 dark:text-indigo-400 font-bold hover:underline"
+                        className="text-lime-600 dark:text-lime-400 font-bold hover:underline"
                       >
                         Have account? Sign In
                       </button>
@@ -619,7 +619,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   onClick={() => setThemeMode(t.id)}
                   className={`p-3.5 rounded-surface border text-center flex flex-col items-center justify-center gap-2 transition-all ${
                     isSelected
-                      ? 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-500 text-indigo-600 dark:text-indigo-400 font-bold '
+                      ? 'bg-lime-50 dark:bg-lime-950/60 border-lime-500 text-lime-600 dark:text-lime-400 font-bold '
                       : 'bg-zinc-50 dark:bg-zinc-800/60 border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:border-zinc-300 dark:hover:border-zinc-600'
                   }`}
                 >
@@ -633,7 +633,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           <button
             type="button"
             onClick={onOpenShortcuts}
-            className="flex min-h-11 w-full items-center justify-between rounded-surface border border-zinc-200 bg-white px-4 py-3 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
+            className="flex min-h-11 w-full items-center justify-between rounded-surface border border-zinc-200 bg-white px-4 py-3 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
           >
             <span className="flex items-center gap-2"><Keyboard aria-hidden="true" className="h-4 w-4" /> Keyboard shortcuts</span>
             <span className="font-mono-num text-xs text-zinc-500">?</span>
@@ -659,9 +659,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <button
               onClick={exportCSV}
               disabled={entries.length === 0}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-surface bg-zinc-900 hover:bg-zinc-800 dark:bg-indigo-600 dark:hover:bg-indigo-500 disabled:opacity-40 text-white text-xs font-bold uppercase tracking-wider transition-colors shrink-0 "
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-surface bg-zinc-900 hover:bg-zinc-800 dark:bg-lime-600 dark:hover:bg-lime-500 disabled:opacity-40 text-white text-xs font-bold uppercase tracking-wider transition-colors shrink-0 "
             >
-              <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-400" />
+              <FileSpreadsheet className="w-3.5 h-3.5 text-lime-400" />
               <span>Export CSV</span>
             </button>
           </div>
@@ -697,13 +697,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         {/* Section 5: Vault App Summary Info */}
         <div className="p-4 rounded-surface bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800/80 space-y-3">
           <div className="flex items-center gap-3 pb-2 border-b border-zinc-200/60 dark:border-zinc-800">
-            <div className="w-10 h-10 rounded-surface overflow-hidden  shrink-0 border border-indigo-100 dark:border-indigo-900/60">
+            <div className="w-10 h-10 rounded-surface overflow-hidden  shrink-0 border border-lime-100 dark:border-lime-900/60">
               <img src="/favicon.svg" alt="Vault Icon" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
             </div>
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="font-extrabold text-xs text-zinc-900 dark:text-white">Vault UGX</span>
-                <span className="text-xs font-bold px-1.5 py-0.2 rounded bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400">v1.2</span>
+                <span className="text-xs font-bold px-1.5 py-0.2 rounded bg-lime-50 dark:bg-lime-950/80 text-lime-600 dark:text-lime-400">v1.2</span>
               </div>
               <p className="text-xs text-zinc-400 dark:text-zinc-500">Smart Daily Savings & Multi-Device Sync</p>
             </div>
@@ -718,7 +718,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
             <div className="flex items-center justify-between font-medium">
               <span>Currency:</span>
-              <span className="font-bold text-indigo-600 dark:text-indigo-400">UGX (Ugandan Shillings)</span>
+              <span className="font-bold text-lime-600 dark:text-lime-400">UGX (Ugandan Shillings)</span>
             </div>
             <div className="flex items-center justify-between font-medium">
               <span>Categories Tracked:</span>

@@ -77,6 +77,10 @@ export default function App() {
   const [debtPayments, setDebtPayments] = useState<DebtPaymentEntry[]>(getLocalDebtPayments());
   const [activeTab, setActiveTab] = useState<ActiveTab>('overview');
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [activeTab]);
+
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [preselectedCategory, setPreselectedCategory] = useState<CategoryId | undefined>(undefined);
   const [editingEntry, setEditingEntry] = useState<SavingsEntry | null>(null);
