@@ -12,6 +12,7 @@ import {
   Edit3,
 } from 'lucide-react';
 import type { CategoryGoal, CategoryId, SavingsEntry } from '../types';
+import type { DebtPaymentEntry } from '../types';
 import { formatUGX } from '../lib/constants';
 
 interface HistoryLedgerProps {
@@ -19,15 +20,16 @@ interface HistoryLedgerProps {
   categories: Record<CategoryId, CategoryGoal>;
   onEditEntry: (entry: SavingsEntry) => void;
   onDeleteEntry: (entry: SavingsEntry) => void;
+  debtPayments?: DebtPaymentEntry[];
 }
 
-export const HistoryLedger: React.FC<HistoryLedgerProps> = ({ entries, categories, onEditEntry, onDeleteEntry }) => {
-  const [selectedFilter, setSelectedFilter] = useState<CategoryId | 'all'>('all');
+export const HistoryLedger: React.FC<HistoryLedgerProps> = ({ entries, categories, onEditEntry, onDeleteEntry, debtPayments = [] }) => {
+  const [selectedFilter, setSelectedFilter] = useState<CategoryId | 'office_debt' | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   const filteredEntries = entries.filter((entry) => {
-    if (selectedFilter !== 'all' && entry.categoryId !== selectedFilter) return false;
+    if (selectedFilter === 'office_debt' || (selectedFilter !== 'all' && entry.categoryId !== selectedFilter)) return false;
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
     return Boolean(
@@ -36,7 +38,8 @@ export const HistoryLedger: React.FC<HistoryLedgerProps> = ({ entries, categorie
       entry.amount.toString().includes(query)
     );
   });
-  const totalSavedInFilter = filteredEntries.reduce((sum, entry) => sum + entry.amount, 0);
+  const filteredPayments = debtPayments.filter((payment) => selectedFilter === 'office_debt' && (!searchQuery || `${payment.date} ${payment.note || ''} ${payment.amount}`.toLowerCase().includes(searchQuery.toLowerCase())));
+  const totalSavedInFilter = selectedFilter === 'office_debt' ? filteredPayments.reduce((sum, payment) => sum + payment.amount, 0) : filteredEntries.reduce((sum, entry) => sum + entry.amount, 0);
   const clearFilters = () => {
     setSelectedFilter('all');
     setSearchQuery('');
@@ -67,6 +70,7 @@ export const HistoryLedger: React.FC<HistoryLedgerProps> = ({ entries, categorie
     { id: 'home_rent' as const, label: 'Home Rent', icon: Home },
     { id: 'internet' as const, label: 'Internet', icon: Wifi },
     { id: 'work_rent' as const, label: 'Work Rent', icon: Briefcase },
+    { id: 'office_debt' as const, label: 'Office Debt', icon: History },
   ];
 
   return (
@@ -94,7 +98,7 @@ export const HistoryLedger: React.FC<HistoryLedgerProps> = ({ entries, categorie
           </button>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4" role="group" aria-label="Filter by savings goal">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-5" role="group" aria-label="Filter history">
           {filters.map((filter) => {
             const Icon = filter.icon;
             const selected = selectedFilter === filter.id;
@@ -139,10 +143,12 @@ export const HistoryLedger: React.FC<HistoryLedgerProps> = ({ entries, categorie
       <section aria-labelledby="ledger-records-title" className="space-y-3 rounded-surface border border-border bg-card p-4 sm:p-5">
         <div className="flex items-center justify-between gap-2">
           <h3 id="ledger-records-title" className="text-base font-semibold">Records</h3>
-          <span className="font-mono-num tabular-nums text-sm text-muted-foreground">{filteredEntries.length}</span>
+          <span className="font-mono-num tabular-nums text-sm text-muted-foreground">{selectedFilter === 'office_debt' ? filteredPayments.length : filteredEntries.length}</span>
         </div>
 
-        {filteredEntries.length === 0 ? (
+        {selectedFilter === 'office_debt' ? (
+          filteredPayments.length ? <ul className="divide-y divide-border">{filteredPayments.map((payment) => <li key={payment.id} className="flex items-center justify-between py-3 text-sm"><span>{payment.date}{payment.note ? ` · ${payment.note}` : ''}</span><strong>−{formatUGX(payment.amount)}</strong></li>)}</ul> : <p className="text-sm text-muted-foreground">No office debt payments recorded.</p>
+        ) : filteredEntries.length === 0 ? (
           <div className="rounded-surface border border-dashed border-border bg-muted/40 p-4">
             <p className="text-sm font-medium">{entries.length === 0 ? 'No deposits recorded yet.' : 'No deposits match these filters.'}</p>
             <p className="mt-1 text-sm text-muted-foreground">

@@ -1,7 +1,7 @@
 import { Briefcase, Home, Landmark, Wifi } from 'lucide-react';
 import type { CategoryId } from '../types';
 
-export type ActiveTab = 'overview' | CategoryId | 'debt' | 'expenses' | 'history';
+export type ActiveTab = 'overview' | CategoryId | 'debt' | 'history' | 'settings';
 
 interface CategoryTabsProps {
   activeTab: ActiveTab;

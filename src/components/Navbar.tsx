@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings, Bell, Cloud, LogIn, Search } from 'lucide-react';
+import { Settings, Bell, Cloud, LogIn } from 'lucide-react';
 import { UserProfile } from '../types';
 import { ActiveTab } from './CategoryTabs';
 import { useNotifications } from '../context/NotificationContext';
@@ -33,13 +33,13 @@ export const Navbar: React.FC<NavbarProps> = ({
     : 'V';
 
   const tabLabels: Record<ActiveTab, { title: string; subtitle: string }> = {
-    overview: { title: 'Dashboard', subtitle: 'Overview of monthly goals, daily burn rate & commitments' },
-    home_rent: { title: 'Home Rent', subtitle: 'Target: 500,000 UGX monthly living rent' },
-    internet: { title: 'Internet & WiFi', subtitle: 'Target: 175,000 UGX connectivity budget' },
-    work_rent: { title: 'Work Rent', subtitle: 'Target: 150,000 UGX workspace & co-working' },
-    debt: { title: 'Office Debt Commitment', subtitle: '720,000 UGX total debt • 2,000 UGX/day minimum' },
-    expenses: { title: 'Daily Expenses', subtitle: 'Tracking outflows, fuel, groceries & utilities' },
-    history: { title: 'Savings Ledger', subtitle: 'Historical audit log & exportable record of all deposits' },
+    overview: { title: 'Dash', subtitle: 'Your money, at a glance' },
+    home_rent: { title: 'Home', subtitle: 'Rent savings' },
+    internet: { title: 'WiFi', subtitle: 'Connectivity savings' },
+    work_rent: { title: 'Work', subtitle: 'Workspace savings' },
+    debt: { title: 'Office', subtitle: 'Debt payments' },
+    history: { title: 'History', subtitle: 'All records' },
+    settings: { title: 'Settings', subtitle: 'Account and preferences' },
   };
 
   const currentMeta = tabLabels[activeTab] || tabLabels.overview;
@@ -64,9 +64,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                 UGX
               </span>
             </div>
-            <p className="text-xs text-zinc-400 dark:text-zinc-500 font-medium">
-              Daily Budget & Savings
-            </p>
           </div>
         </div>
 
@@ -76,27 +73,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <h2 className="text-lg font-black text-zinc-900 dark:text-white tracking-tight leading-tight flex items-center gap-2">
               <span>{currentMeta.title}</span>
             </h2>
-            <p className="text-xs text-zinc-400 dark:text-zinc-500 font-medium">
-              {currentMeta.subtitle}
-            </p>
           </div>
-        </div>
-
-        {/* Search and command palette */}
-        <div className="hidden lg:flex items-center gap-3">
-          {onOpenCommandPalette && (
-            <button
-              onClick={onOpenCommandPalette}
-              className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-surface bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:border-zinc-300 dark:hover:border-zinc-700  transition-all text-xs font-medium"
-            >
-              <Search className="w-3.5 h-3.5 text-zinc-400" />
-              <span className="text-zinc-400">Search or jump to...</span>
-              <kbd className="px-1.5 py-0.5 rounded-surface bg-zinc-100 dark:bg-zinc-800 text-xs font-mono font-bold text-zinc-500 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-700">
-                ⌘K
-              </kbd>
-            </button>
-          )}
-
         </div>
 
         {/* Right side: Realtime Cloud Sync Status, Notification Bell & Settings buttons */}
@@ -162,9 +139,6 @@ export const Navbar: React.FC<NavbarProps> = ({
             ) : (
               <Settings className="w-4 h-4 text-zinc-500 dark:text-zinc-400 group-hover:rotate-45 transition-transform duration-300" />
             )}
-            <span className="hidden md:inline text-xs font-bold text-zinc-700 dark:text-zinc-300">
-              Settings
-            </span>
           </button>
         </div>
       </div>
