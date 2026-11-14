@@ -70,7 +70,7 @@ export const CategoryDetailView: React.FC<CategoryDetailViewProps> = ({
   };
 
   return (
-    <div id={`category-detail-${category.id}`} className="w-full space-y-5 px-4 pb-8 sm:px-6">
+    <div id={`category-detail-${category.id}`} className="w-full space-y-3 px-3 pb-8 sm:space-y-5 sm:px-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <button
           id="back-to-overview-btn"
@@ -165,15 +165,15 @@ export const CategoryDetailView: React.FC<CategoryDetailViewProps> = ({
         </div>
       )}
 
-      <section aria-labelledby="category-title" className="space-y-4 rounded-surface border border-border bg-card p-4 sm:p-6">
-        <div className="flex flex-wrap items-start justify-between gap-4 border-b border-border pb-4">
+      <section aria-labelledby="category-title" className="space-y-3 rounded-surface border border-border bg-card p-3 sm:space-y-4 sm:p-6">
+        <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border pb-3 sm:pb-4">
           <div className="flex items-start gap-3">
             <span className="inline-flex size-12 shrink-0 items-center justify-center rounded-surface bg-muted text-foreground">
               <CategoryIcon aria-hidden="true" size={24} strokeWidth={1.8} />
             </span>
             <div>
-              <h2 id="category-title" className="text-display font-semibold tracking-tight">{category.name}</h2>
-              <p className="mt-1 text-sm text-muted-foreground">{category.description}</p>
+              <h2 id="category-title" className="text-xl font-semibold tracking-tight sm:text-display">{category.name}</h2>
+              <p className="mt-1 hidden text-sm text-muted-foreground sm:block">{category.description}</p>
             </div>
           </div>
           {isComplete && (
@@ -183,18 +183,18 @@ export const CategoryDetailView: React.FC<CategoryDetailViewProps> = ({
           )}
         </div>
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <div className="rounded-surface bg-muted/50 p-3">
-            <p className="text-xs font-medium text-muted-foreground">Target</p>
-            <p className="mt-1 font-mono-num tabular-nums text-base font-semibold">{formatUGX(target)}</p>
+        <div className="grid grid-cols-3 gap-2">
+          <div className="rounded-surface bg-muted/50 p-2 sm:p-3">
+            <p className="text-[11px] font-medium text-muted-foreground sm:text-xs">Target</p>
+            <p className="mt-0.5 truncate font-mono-num tabular-nums text-xs font-semibold sm:text-base">{formatUGX(target)}</p>
           </div>
-          <div className="rounded-surface bg-muted/50 p-3">
-            <p className="text-xs font-medium text-muted-foreground">Saved</p>
-            <p className="mt-1 font-mono-num tabular-nums text-base font-semibold">{formatUGX(current)}</p>
+          <div className="rounded-surface bg-muted/50 p-2 sm:p-3">
+            <p className="text-[11px] font-medium text-muted-foreground sm:text-xs">Saved</p>
+            <p className="mt-0.5 truncate font-mono-num tabular-nums text-xs font-semibold sm:text-base">{formatUGX(current)}</p>
           </div>
-          <div className="rounded-surface bg-muted/50 p-3">
-            <p className="text-xs font-medium text-muted-foreground">Remaining</p>
-            <p className="mt-1 font-mono-num tabular-nums text-base font-semibold">{formatUGX(remaining)}</p>
+          <div className="rounded-surface bg-muted/50 p-2 sm:p-3">
+            <p className="text-[11px] font-medium text-muted-foreground sm:text-xs">Left</p>
+            <p className="mt-0.5 truncate font-mono-num tabular-nums text-xs font-semibold sm:text-base">{formatUGX(remaining)}</p>
           </div>
         </div>
 
@@ -206,29 +206,21 @@ export const CategoryDetailView: React.FC<CategoryDetailViewProps> = ({
           <div role="progressbar" aria-label={`${category.name} progress`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct} className="h-2.5 overflow-hidden rounded-pill bg-muted">
             <div className="h-full rounded-pill bg-primary transition-[width] duration-200 ease-out" style={{ width: `${pct}%` }} />
           </div>
-          <div className="mt-2 grid grid-cols-4 text-xs font-mono-num tabular-nums text-muted-foreground">
-            {[25, 50, 75, 100].map((milestone) => (
-              <span key={milestone} className={pct >= milestone ? 'font-semibold text-primary' : ''}>{milestone}%</span>
-            ))}
-          </div>
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-2 rounded-surface border border-border p-3">
+        <div className="flex items-center justify-between gap-2 rounded-surface border border-border px-3 py-2">
           <div className="flex items-center gap-2">
-            <TrendingUp aria-hidden="true" size={18} strokeWidth={1.8} className="text-muted-foreground" />
-            <div>
-              <p className="text-sm font-medium">{isComplete ? 'You reached this goal' : `${formatUGX(dailyNeeded)} per day to reach your goal`}</p>
-              <p className="mt-0.5 text-xs text-muted-foreground">Based on {daysLeftInMonth} days left in this cycle</p>
-            </div>
+            <TrendingUp aria-hidden="true" size={16} strokeWidth={1.8} className="text-muted-foreground" />
+            <p className="text-xs font-medium sm:text-sm">{isComplete ? 'Goal reached' : `${formatUGX(dailyNeeded)}/day needed`}</p>
           </div>
-          {isComplete && <Target aria-hidden="true" size={18} strokeWidth={1.8} className="text-success" />}
+          <span className="text-[11px] text-muted-foreground">{daysLeftInMonth}d left</span>
         </div>
       </section>
 
-      <section aria-labelledby="quick-deposit-heading" className="space-y-3 rounded-surface border border-border bg-card p-4 sm:p-5">
+      <section aria-labelledby="quick-deposit-heading" className="space-y-2 rounded-surface border border-border bg-card p-3 sm:space-y-3 sm:p-5">
         <div>
           <h3 id="quick-deposit-heading" className="text-base font-semibold">Quick deposits</h3>
-          <p className="mt-1 text-sm text-muted-foreground">Add a preset amount or enter a custom deposit.</p>
+          <p className="mt-1 hidden text-sm text-muted-foreground sm:block">Add a preset amount or enter a custom deposit.</p>
         </div>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           {QUICK_ADD_AMOUNTS.map((amount) => (
@@ -237,7 +229,7 @@ export const CategoryDetailView: React.FC<CategoryDetailViewProps> = ({
               id={`detail-quick-add-${amount}`}
               type="button"
               onClick={() => onQuickAdd(category.id, amount)}
-              className="min-h-11 rounded-surface border border-border px-2 text-sm font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="min-h-10 rounded-surface border border-border px-2 text-xs font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:text-sm"
             >
               +{formatUGX(amount)}
             </button>
@@ -247,7 +239,7 @@ export const CategoryDetailView: React.FC<CategoryDetailViewProps> = ({
           id="detail-custom-deposit-btn"
           type="button"
           onClick={() => onOpenAddModal(category.id)}
-          className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-surface bg-primary px-4 text-sm font-semibold text-primary-foreground hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-surface bg-primary px-4 text-xs font-semibold text-primary-foreground hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:text-sm"
         >
           <Plus aria-hidden="true" size={16} strokeWidth={1.8} /> Custom amount and note
         </button>

@@ -65,7 +65,6 @@ export const OfficeDebtView: React.FC<OfficeDebtViewProps> = ({
   const [quickAmount, setQuickAmount] = useState<string>('2000');
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>('cash');
   const [paymentDate, setPaymentDate] = useState<string>(() => new Date().toISOString().split('T')[0]);
-  const [paymentNote, setPaymentNote] = useState<string>('Daily office debt installment');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   // Edit payment modal state
@@ -84,10 +83,9 @@ export const OfficeDebtView: React.FC<OfficeDebtViewProps> = ({
   // Delete confirm state
   const [paymentToDelete, setPaymentToDelete] = useState<DebtPaymentEntry | null>(null);
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState<boolean>(false);
-  const [copiedText, setCopiedText] = useState<boolean>(false);
 
   // Dynamic Payoff Speed Calculator interactive pace selection
-  const [calculatorMode, setCalculatorMode] = useState<'pattern' | 'minimum' | 'moderate' | 'turbo' | 'custom'>('pattern');
+  const [calculatorMode, setCalculatorMode] = useState<'pattern' | 'custom'>('pattern');
   const [customPace, setCustomPace] = useState<number>(4000);
 
   // Collapsible groups state for transaction history
@@ -111,7 +109,6 @@ export const OfficeDebtView: React.FC<OfficeDebtViewProps> = ({
   }, [payments, todayStr]);
 
   const isTodayCompleted = todayPaidSum >= dailyMin;
-  const todayRemainingForMin = Math.max(0, dailyMin - todayPaidSum);
 
   // Daily streak calculation (consecutive days with at least dailyMin paid)
   const streakDays = useMemo(() => {
@@ -231,20 +228,7 @@ export const OfficeDebtView: React.FC<OfficeDebtViewProps> = ({
 
   // Selected active velocity for calculator
   const activeDailyVelocity = useMemo(() => {
-    switch (calculatorMode) {
-      case 'pattern':
-        return patternAnalysis.dailyPace;
-      case 'minimum':
-        return dailyMin;
-      case 'moderate':
-        return 5000;
-      case 'turbo':
-        return 10000;
-      case 'custom':
-        return Math.max(500, customPace);
-      default:
-        return patternAnalysis.dailyPace;
-    }
+    return calculatorMode === 'custom' ? Math.max(500, customPace) : patternAnalysis.dailyPace;
   }, [calculatorMode, patternAnalysis.dailyPace, dailyMin, customPace]);
 
   // Helper to format remaining duration dynamically into years, months, and days
@@ -310,14 +294,6 @@ export const OfficeDebtView: React.FC<OfficeDebtViewProps> = ({
   const currentPayoffEstimate = useMemo(() => {
     return formatPayoffDuration(activeDailyVelocity, remaining);
   }, [activeDailyVelocity, remaining]);
-
-  const patternPayoffEstimate = useMemo(() => {
-    return formatPayoffDuration(patternAnalysis.dailyPace, remaining);
-  }, [patternAnalysis.dailyPace, remaining]);
-
-  const minPacePayoffEstimate = useMemo(() => {
-    return formatPayoffDuration(dailyMin, remaining);
-  }, [dailyMin, remaining]);
 
   // Estimated payoff target date at daily minimum pace for summary
   const estimatedPayoffDate = currentPayoffEstimate.finishDate;
@@ -444,7 +420,7 @@ export const OfficeDebtView: React.FC<OfficeDebtViewProps> = ({
         paymentMethod: selectedMethod,
         sourceAccount: 'general_wallet',
         deductFromVault: false,
-        note: paymentNote.trim() || 'Daily office debt installment',
+        note: 'Office debt payment',
         createdAt: Date.now(),
       });
 
@@ -509,55 +485,16 @@ export const OfficeDebtView: React.FC<OfficeDebtViewProps> = ({
     setIsConfigOpen(false);
   };
 
-  // Copy Summary statement
-  const handleCopySummary = () => {
-    const summary = `Office Debt Repayment Summary
-Principal: ${formatUGX(totalDebt)}
-Total Paid: ${formatUGX(totalPaid)} (${progressPct}%)
-Remaining Balance: ${formatUGX(remaining)}
-Daily Target: At least ${formatUGX(dailyMin)}/day
-Today Paid: ${formatUGX(todayPaidSum)} (${isTodayCompleted ? 'Target Met ✓' : `${formatUGX(todayRemainingForMin)} remaining today`})
-Pattern Pace: ~${formatUGX(patternAnalysis.dailyPace)}/day (${patternAnalysis.paceLabel})
-Time Remaining: ${currentPayoffEstimate.breakdownText} (${currentPayoffEstimate.totalDays} days)
-Estimated Debt-Free Date: ${currentPayoffEstimate.finishDate}
-Logs Recorded: ${payments.length} installments`;
-
-    navigator.clipboard.writeText(summary).then(() => {
-      setCopiedText(true);
-      setTimeout(() => setCopiedText(false), 2500);
-    });
-  };
-
   return (
     <div id="office-debt-view" className="space-y-6 px-4 sm:px-6 pb-28 max-w-4xl mx-auto w-full">
       {/* Header Info with Quick Settings & Copy Share */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-lime-600 dark:text-lime-400 uppercase tracking-widest flex items-center gap-1.5">
-              <Landmark className="w-3.5 h-3.5" />
-              Office Debt Payoff Commitment
-            </span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white tracking-tight mt-0.5">
-            Office Debt (720k)
-          </h1>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
-            Mandatory daily installments of at least <strong className="text-lime-600 dark:text-lime-400">{formatUGX(dailyMin)}/day</strong> until fully cleared.
-          </p>
+      <div className="flex items-center justify-between gap-3 pt-1">
+        <div className="flex min-w-0 items-center gap-2">
+          <Landmark className="size-4 shrink-0 text-lime-400" />
+          <h1 className="truncate text-xl font-bold tracking-tight text-zinc-100 sm:text-2xl">Office Debt</h1>
         </div>
 
-        <div className="flex items-center gap-2 self-start sm:self-auto">
-          <button
-            id="debt-copy-summary-btn"
-            onClick={handleCopySummary}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-surface text-xs font-bold bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors "
-            title="Copy payoff report to clipboard"
-          >
-            {copiedText ? <Check className="w-3.5 h-3.5 text-lime-500" /> : <Copy className="w-3.5 h-3.5 text-zinc-400" />}
-            <span>{copiedText ? 'Copied' : 'Share Report'}</span>
-          </button>
-
+        <div className="flex shrink-0 items-center gap-2">
           <button
             id="debt-settings-btn"
             onClick={() => {
@@ -566,429 +503,114 @@ Logs Recorded: ${payments.length} installments`;
               setConfigCreditor(debt.creditorName || '');
               setIsConfigOpen(true);
             }}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-surface text-xs font-bold bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors "
+            className="flex items-center gap-1.5 rounded-surface border border-zinc-700 bg-zinc-900 px-2.5 py-2 text-xs font-semibold text-zinc-200 hover:bg-zinc-800"
           >
-            <Sliders className="w-3.5 h-3.5 text-zinc-400" />
-            <span>Target Config</span>
+            <Sliders className="size-3.5 text-lime-400" />
+            <span>Target</span>
           </button>
         </div>
       </div>
 
       {/* Main Metric Hero Card */}
-      <div className="bg-white dark:bg-zinc-900 rounded-surface sm:rounded-surface p-6 sm:p-8  border border-lime-200/70 dark:border-lime-900/40 relative overflow-hidden transition-colors">
+      <div className="relative overflow-hidden rounded-surface border border-lime-900/50 bg-zinc-900/80 p-4 sm:p-6">
         {/* Subtle decorative background glow */}
         <div className="absolute -right-16 -top-16 w-56 h-56 rounded-full bg-lime-500/10 dark:bg-lime-500/5 blur-3xl pointer-events-none" />
 
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-6 border-b border-zinc-100 dark:border-zinc-800">
-          <div className="space-y-1">
-            <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">
-              Remaining Debt Balance
-            </span>
-            <div className="flex items-baseline gap-3 flex-wrap">
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-zinc-900 dark:text-white font-mono-num tracking-tight">
+        <div className="flex items-center justify-between gap-3 border-b border-zinc-800 pb-3">
+          <div className="min-w-0">
+            <span className="block text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Remaining</span>
+            <div className="flex flex-wrap items-baseline gap-x-2">
+              <h2 className="text-2xl font-bold tracking-tight text-white font-mono-num sm:text-3xl">
                 {formatUGX(remaining)}
               </h2>
-              <span className="text-sm font-semibold text-zinc-400 dark:text-zinc-500">
-                of {formatUGX(totalDebt)} original debt
+              <span className="text-xs text-zinc-500">
+                of {formatUGX(totalDebt)}
               </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="text-right">
-              <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">
-                Total Paid Off
-              </span>
-              <span className="text-xl sm:text-2xl font-black text-lime-600 dark:text-lime-400 font-mono-num">
-                {formatUGX(totalPaid)}
-              </span>
-            </div>
-            <div className="w-14 h-14 rounded-surface bg-lime-50 dark:bg-lime-950/60 border border-lime-200 dark:border-lime-900/60 text-lime-600 dark:text-lime-400 flex flex-col items-center justify-center font-mono-num font-black text-sm shrink-0">
-              <span>{progressPct}%</span>
-              <span className="text-xs font-bold uppercase tracking-tighter opacity-70">Paid</span>
-            </div>
+          <div className="shrink-0 text-right">
+            <span className="block text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Paid</span>
+            <span className="font-mono-num text-sm font-bold text-lime-300">{progressPct}%</span>
           </div>
         </div>
 
         {/* Progress bar */}
-        <div className="mt-6 space-y-2">
-          <div className="flex justify-between items-center text-xs font-bold">
-            <span className="text-zinc-500 dark:text-zinc-400">Payoff Completion</span>
-            <span className="font-mono-num text-lime-700 dark:text-lime-400">
-              {formatUGX(totalPaid)} / {formatUGX(totalDebt)}
-            </span>
-          </div>
-          <div className="w-full bg-zinc-100 dark:bg-zinc-800 h-4 rounded-full overflow-hidden p-0.5 border border-zinc-200/60 dark:border-zinc-700/60">
+        <div className="mt-3">
+          <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-800">
             <div
-              className="bg-primary h-full rounded-full transition-all duration-500 "
+              className="h-full rounded-full bg-lime-400 transition-all duration-500"
               style={{ width: `${Math.max(3, progressPct)}%` }}
             />
           </div>
         </div>
 
         {/* Status Highlights Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6 pt-4 border-t border-zinc-100 dark:border-zinc-800">
+        <div className="mt-3 grid grid-cols-3 gap-2 border-t border-zinc-800 pt-3">
           {/* Today's Quota Badge */}
-          <div className={`p-3.5 rounded-surface border transition-colors flex items-center gap-3 ${
-            isTodayCompleted
-              ? 'bg-lime-50 dark:bg-lime-950/40 border-lime-200 dark:border-lime-900/60 text-lime-900 dark:text-lime-200'
-              : 'bg-lime-50/80 dark:bg-lime-950/30 border-lime-200 dark:border-lime-900/50 text-lime-900 dark:text-lime-200'
-          }`}>
-            <div className={`w-9 h-9 rounded-surface flex items-center justify-center shrink-0 ${
-              isTodayCompleted
-                ? 'bg-lime-600 text-white'
-                : 'bg-lime-500 text-white'
-            }`}>
-              {isTodayCompleted ? <CheckCircle2 className="w-5 h-5" /> : <Calendar className="w-5 h-5" />}
-            </div>
-            <div>
-              <span className="text-xs font-bold uppercase tracking-wider block opacity-75">
-                Today's Daily Minimum
-              </span>
-              <div className="text-xs font-black">
+          <div className="min-w-0 rounded-surface border border-zinc-800 bg-zinc-950/50 p-2">
+            <span className="block truncate text-[10px] font-medium text-zinc-500">Today</span>
+            <div className="truncate text-xs font-bold text-zinc-100">
                 {isTodayCompleted ? (
-                  <span className="text-lime-700 dark:text-lime-400 flex items-center gap-1">
-                    {formatUGX(todayPaidSum)} paid today ✓
+                  <span className="text-lime-300 flex items-center gap-1">
+                    {formatUGX(todayPaidSum)} ✓
                   </span>
                 ) : (
-                  <span className="text-lime-800 dark:text-lime-300">
-                    {formatUGX(todayPaidSum)} / {formatUGX(dailyMin)} ({formatUGX(todayRemainingForMin)} left)
+                  <span className="text-lime-300">
+                    {formatUGX(todayPaidSum)} / {formatUGX(dailyMin)}
                   </span>
                 )}
-              </div>
             </div>
           </div>
 
           {/* Daily Streak */}
-          <div className="p-3.5 rounded-surface bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/60 dark:border-zinc-800 flex items-center gap-3">
-            <div className="w-9 h-9 rounded-surface bg-lime-500 text-white flex items-center justify-center shrink-0 ">
-              <Flame className="w-5 h-5" />
-            </div>
-            <div>
-              <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">
-                Daily Payoff Streak
-              </span>
-              <span className="text-xs font-black text-zinc-800 dark:text-zinc-100 font-mono-num">
-                {streakDays} {streakDays === 1 ? 'day' : 'consecutive days'} (≥2k/day)
-              </span>
-            </div>
+          <div className="min-w-0 rounded-surface border border-zinc-800 bg-zinc-950/50 p-2">
+            <span className="block truncate text-[10px] font-medium text-zinc-500">Streak</span>
+            <span className="truncate text-xs font-bold text-zinc-100 font-mono-num">{streakDays} days</span>
           </div>
 
           {/* Projected Clearance Date */}
-          <div className="p-3.5 rounded-surface bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/60 dark:border-zinc-800 flex items-center gap-3">
-            <div className="w-9 h-9 rounded-surface bg-lime-600 text-white flex items-center justify-center shrink-0 ">
-              <CalendarCheck className="w-5 h-5" />
-            </div>
-            <div>
-              <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">
-                Debt-Free Target Date
-              </span>
-              <span className="text-xs font-black text-zinc-800 dark:text-zinc-100">
-                {isFullyPaid ? 'Debt 100% Cleared ' : estimatedPayoffDate}
-              </span>
-            </div>
+          <div className="min-w-0 rounded-surface border border-zinc-800 bg-zinc-950/50 p-2">
+            <span className="block truncate text-[10px] font-medium text-zinc-500">Debt-free</span>
+            <span className="truncate text-xs font-bold text-zinc-100">{isFullyPaid ? 'Cleared' : estimatedPayoffDate}</span>
           </div>
         </div>
       </div>
 
-      {/* Dynamic Payoff Speed Calculator based on deposit pattern */}
       {!isFullyPaid && (
-        <div className="bg-zinc-900 text-white rounded-surface p-5 sm:p-7 shadow-floating border border-zinc-800 relative overflow-hidden">
-
-          {/* Calculator Header & Pattern Overview */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-lime-900/70">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-surface bg-lime-500/20 border border-lime-400/40 text-lime-400 flex items-center justify-center shrink-0">
-                <Zap className="w-4 h-4" />
-              </div>
-              <div>
-                <h3 className="text-sm font-bold uppercase tracking-wider text-lime-400 flex items-center gap-2">
-                  <span>Payoff Speed Calculator</span>
-                  <span className="text-xs px-2 py-0.5 rounded-full font-bold bg-lime-400/20 text-lime-300 border border-lime-400/30">
-                    Dynamic
-                  </span>
-                </h3>
-                <p className="text-xs text-zinc-300">
-                  Calculates exact remaining time in years, months, and days based on your actual deposit history.
-                </p>
-              </div>
-            </div>
-
-            {/* Current Pattern Badge */}
-            <div className="flex items-center gap-2 self-start sm:self-auto bg-zinc-800/80 border border-zinc-700/80 px-3 py-1.5 rounded-surface text-xs">
-              <BarChart3 className="w-3.5 h-3.5 text-lime-400" />
-              <span className="text-zinc-300">Active Velocity:</span>
-              <strong className="text-lime-300 font-mono-num">
-                ~{formatUGX(activeDailyVelocity)}/day
-              </strong>
-            </div>
+        <details className="rounded-surface border border-lime-900/50 bg-zinc-900/70 px-4 py-3 text-white">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold marker:content-none">
+            <span>Payoff estimate</span>
+            <span className="text-xs font-medium text-lime-300">{currentPayoffEstimate.displayBadge} · {currentPayoffEstimate.finishDate}</span>
+          </summary>
+          <div className="mt-3 flex items-center justify-between border-t border-zinc-800 pt-3 text-xs text-zinc-400">
+            <span>At {formatUGX(activeDailyVelocity)}/day</span>
+            <button type="button" onClick={() => setCalculatorMode((mode) => mode === 'custom' ? 'pattern' : 'custom')} className="font-semibold text-lime-300">
+              {calculatorMode === 'custom' ? 'Use actual pace' : 'Adjust pace'}
+            </button>
           </div>
-
-          {/* Dynamic Countdown Display (Years, Months, Days) */}
-          <div className="my-5 p-4 sm:p-5 rounded-surface bg-zinc-950/70 border border-lime-800/50">
-            <span className="text-xs font-bold uppercase tracking-wider text-lime-300 block mb-3">
-              Remaining Payoff Duration ({calculatorMode === 'pattern' ? patternAnalysis.paceLabel : `${formatUGX(activeDailyVelocity)}/day`})
-            </span>
-
-            <div className="grid grid-cols-3 gap-2.5 sm:gap-4 text-center">
-              {/* Years */}
-              <div className="bg-zinc-900/90 border border-lime-900/70 rounded-surface p-3 sm:p-4">
-                <div className="text-2xl sm:text-4xl font-black text-lime-400 font-mono-num">
-                  {currentPayoffEstimate.years}
-                </div>
-                <div className="text-xs sm:text-xs font-bold uppercase tracking-wider text-zinc-400 mt-1">
-                  {currentPayoffEstimate.years === 1 ? 'Year' : 'Years'}
-                </div>
-              </div>
-
-              {/* Months */}
-              <div className="bg-zinc-900/90 border border-lime-900/70 rounded-surface p-3 sm:p-4">
-                <div className="text-2xl sm:text-4xl font-black text-lime-300 font-mono-num">
-                  {currentPayoffEstimate.months}
-                </div>
-                <div className="text-xs sm:text-xs font-bold uppercase tracking-wider text-zinc-400 mt-1">
-                  {currentPayoffEstimate.months === 1 ? 'Month' : 'Months'}
-                </div>
-              </div>
-
-              {/* Days */}
-              <div className="bg-zinc-900/90 border border-lime-900/70 rounded-surface p-3 sm:p-4">
-                <div className="text-2xl sm:text-4xl font-black text-lime-400 font-mono-num">
-                  {currentPayoffEstimate.days}
-                </div>
-                <div className="text-xs sm:text-xs font-bold uppercase tracking-wider text-zinc-400 mt-1">
-                  {currentPayoffEstimate.days === 1 ? 'Day' : 'Days'}
-                </div>
-              </div>
+          {calculatorMode === 'custom' && (
+            <div className="mt-3 space-y-2">
+              <div className="flex justify-between text-xs text-zinc-400"><span>Daily amount</span><strong className="text-lime-300">{formatUGX(customPace)}</strong></div>
+              <input type="range" min={1000} max={30000} step={500} value={customPace} onChange={(event) => setCustomPace(Number(event.target.value))} className="w-full accent-lime-500" />
             </div>
-
-            {/* Detailed summary row below counters */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mt-4 pt-3 border-t border-zinc-800/80 text-xs">
-              <div className="text-zinc-200">
-                Total Remaining: <strong className="text-white font-mono-num">~{currentPayoffEstimate.totalDays} days</strong> ({currentPayoffEstimate.breakdownText})
-              </div>
-              <div className="text-zinc-300 flex items-center gap-1.5">
-                <CalendarDays className="w-3.5 h-3.5 text-lime-400" />
-                <span>Projected Completion:</span>
-                <strong className="text-lime-300">{currentPayoffEstimate.finishDate}</strong>
-              </div>
-            </div>
-          </div>
-
-          {/* Interactive Pace Selector Buttons */}
-          <div>
-            <div className="flex items-center justify-between gap-2 mb-2">
-              <span className="text-xs font-bold text-zinc-300 uppercase tracking-wider">
-                Compare Payoff Paces:
-              </span>
-              {patternAnalysis.hasHistory && (
-                <span className="text-xs text-lime-400">
-                  {patternAnalysis.totalDepositCount} past deposits analyzed
-                </span>
-              )}
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
-              {/* Mode: User Pattern */}
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.97 }}
-                type="button"
-                onClick={() => setCalculatorMode('pattern')}
-                className={`p-2.5 rounded-surface font-bold border transition-all text-left ${
-                  calculatorMode === 'pattern'
-                    ? 'bg-lime-500 text-zinc-950 border-lime-400 '
-                    : 'bg-zinc-800/80 hover:bg-zinc-700/80 text-zinc-300 border-zinc-700/80'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-xs uppercase tracking-wider">My Pattern</span>
-                  <Target className="w-3 h-3" />
-                </div>
-                <div className="text-xs font-black font-mono-num mt-0.5">
-                  ~{formatUGX(patternAnalysis.dailyPace)}/d
-                </div>
-                <div className="text-xs opacity-80 truncate mt-0.5">
-                  {patternPayoffEstimate.displayBadge}
-                </div>
-              </motion.button>
-
-              {/* Mode: Required Minimum (2,000 UGX) */}
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.97 }}
-                type="button"
-                onClick={() => setCalculatorMode('minimum')}
-                className={`p-2.5 rounded-surface font-bold border transition-all text-left ${
-                  calculatorMode === 'minimum'
-                    ? 'bg-lime-600 text-white border-lime-400 '
-                    : 'bg-zinc-800/80 hover:bg-zinc-700/80 text-zinc-300 border-zinc-700/80'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-xs uppercase tracking-wider">Min Target</span>
-                  <Target className="w-3 h-3" />
-                </div>
-                <div className="text-xs font-black font-mono-num mt-0.5">
-                  {formatUGX(dailyMin)}/d
-                </div>
-                <div className="text-xs opacity-80 truncate mt-0.5">
-                  {minPacePayoffEstimate.displayBadge}
-                </div>
-              </motion.button>
-
-              {/* Mode: Moderate Pace (5,000 UGX) */}
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.97 }}
-                type="button"
-                onClick={() => setCalculatorMode('moderate')}
-                className={`p-2.5 rounded-surface font-bold border transition-all text-left ${
-                  calculatorMode === 'moderate'
-                    ? 'bg-lime-600 text-white border-lime-400 '
-                    : 'bg-zinc-800/80 hover:bg-zinc-700/80 text-zinc-300 border-zinc-700/80'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-xs uppercase tracking-wider">Moderate</span>
-                  <Zap className="w-3 h-3" />
-                </div>
-                <div className="text-xs font-black font-mono-num mt-0.5">
-                  5,000 UGX/d
-                </div>
-                <div className="text-xs opacity-80 truncate mt-0.5">
-                  {formatPayoffDuration(5000, remaining).displayBadge}
-                </div>
-              </motion.button>
-
-              {/* Mode: Turbo Pace (10,000 UGX) */}
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.97 }}
-                type="button"
-                onClick={() => setCalculatorMode('turbo')}
-                className={`p-2.5 rounded-surface font-bold border transition-all text-left ${
-                  calculatorMode === 'turbo'
-                    ? 'bg-lime-600 text-white border-lime-400 '
-                    : 'bg-zinc-800/80 hover:bg-zinc-700/80 text-zinc-300 border-zinc-700/80'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-xs uppercase tracking-wider">Turbo</span>
-                  <Flame className="w-3 h-3" />
-                </div>
-                <div className="text-xs font-black font-mono-num mt-0.5">
-                  10,000 UGX/d
-                </div>
-                <div className="text-xs opacity-80 truncate mt-0.5">
-                  {formatPayoffDuration(10000, remaining).displayBadge}
-                </div>
-              </motion.button>
-
-              {/* Mode: Custom Slider */}
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.97 }}
-                type="button"
-                onClick={() => setCalculatorMode('custom')}
-                className={`p-2.5 rounded-surface font-bold border transition-all text-left col-span-2 sm:col-span-1 ${
-                  calculatorMode === 'custom'
-                    ? 'bg-lime-500 text-zinc-950 border-lime-400 '
-                    : 'bg-zinc-800/80 hover:bg-zinc-700/80 text-zinc-300 border-zinc-700/80'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-xs uppercase tracking-wider">Custom</span>
-                  <Sliders className="w-3 h-3" />
-                </div>
-                <div className="text-xs font-black font-mono-num mt-0.5">
-                  {formatUGX(customPace)}/d
-                </div>
-                <div className="text-xs opacity-80 truncate mt-0.5">
-                  {formatPayoffDuration(customPace, remaining).displayBadge}
-                </div>
-              </motion.button>
-            </div>
-
-            {/* Custom slider interactive control when in custom mode */}
-            <AnimatePresence>
-              {calculatorMode === 'custom' && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.22, ease: [0.25, 1, 0.5, 1] }}
-                  className="overflow-hidden"
-                >
-                  <div className="mt-3 p-3 rounded-surface bg-zinc-950/60 border border-zinc-800 space-y-2">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-zinc-400">Slide to test daily payment capability:</span>
-                      <span className="font-mono-num font-black text-lime-400">{formatUGX(customPace)} / day</span>
-                    </div>
-                    <input
-                      type="range"
-                      min={1000}
-                      max={30000}
-                      step={500}
-                      value={customPace}
-                      onChange={(e) => setCustomPace(parseInt(e.target.value, 10))}
-                      className="w-full accent-lime-500 cursor-pointer"
-                    />
-                    <div className="flex justify-between text-xs text-zinc-500 font-mono">
-                      <span>1,000 UGX</span>
-                      <span>15,000 UGX</span>
-                      <span>30,000 UGX</span>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-          {/* Dynamic Velocity Insights Callout */}
-          <div className="mt-4 p-3 rounded-surface bg-zinc-800/50 border border-zinc-700/60 text-xs text-zinc-300 flex items-start gap-2.5">
-            <Info className="w-4 h-4 text-lime-400 shrink-0 mt-0.5" />
-            <div className="space-y-1">
-              <p>
-                <strong>{patternAnalysis.paceLabel}:</strong> {patternAnalysis.paceDescription}
-              </p>
-              {patternAnalysis.dailyPace > dailyMin ? (
-                <p className="text-lime-300 font-medium">
-                  Your actual deposit velocity will clear this debt ~<strong>{Math.max(0, minPacePayoffEstimate.totalDays - patternPayoffEstimate.totalDays)} days earlier</strong> than the minimum quota!
-                </p>
-              ) : patternAnalysis.hasHistory ? (
-                <p className="text-lime-200">
-                  Tip: Increasing your daily deposit to 5,000 UGX/day would cut your payoff duration down to <strong>{formatPayoffDuration(5000, remaining).breakdownText}</strong>.
-                </p>
-              ) : null}
-            </div>
-          </div>
-        </div>
+          )}
+        </details>
       )}
-
       {/* Log Payment Quick Action Form */}
-      <div className="bg-white dark:bg-zinc-900 rounded-surface sm:rounded-surface p-6 sm:p-8  border border-zinc-100 dark:border-zinc-800 transition-colors">
-        <div className="flex items-center gap-3 pb-5 border-b border-zinc-100 dark:border-zinc-800">
-          <div className="w-12 h-12 rounded-surface bg-lime-500 text-white flex items-center justify-center  shrink-0">
-            <Receipt className="w-6 h-6" />
+      <div className="rounded-surface border border-zinc-800 bg-zinc-900/70 p-3 sm:p-5">
+        <div className="flex items-center gap-2 border-b border-zinc-800 pb-3">
+          <div className="flex size-8 shrink-0 items-center justify-center rounded-surface bg-lime-500 text-zinc-950">
+            <Receipt className="size-4" />
           </div>
-          <div>
-            <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
-              Pay Installment
-            </span>
-            <h3 className="text-xl font-bold text-zinc-900 dark:text-white tracking-tight">
-              Log Office Debt Payment
-            </h3>
-          </div>
+          <h3 className="text-base font-semibold text-zinc-100">Add payment</h3>
         </div>
 
-        <form onSubmit={handlePaySubmit} className="mt-6 space-y-5">
+        <form onSubmit={handlePaySubmit} className="mt-3 space-y-3">
           {/* Quick Preset Buttons */}
           <div>
-            <label className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider block mb-2">
-              Select or Enter Installment Amount
-            </label>
-            <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 mb-3">
+            <label className="mb-1.5 block text-xs font-medium text-zinc-400">Amount</label>
+            <div className="mb-2 grid grid-cols-3 gap-1.5 sm:grid-cols-6">
               {QUICK_DEBT_PAY_AMOUNTS.map((amt) => {
                 const isSelected = quickAmount === amt.toString();
                 return (
@@ -998,14 +620,14 @@ Logs Recorded: ${payments.length} installments`;
                     key={amt}
                     type="button"
                     onClick={() => setQuickAmount(amt.toString())}
-                    className={`py-2.5 px-2 rounded-surface text-xs font-bold transition-all border text-center ${
+                    className={`rounded-surface border px-1.5 py-2 text-[11px] font-semibold transition-all text-center ${
                       isSelected
                         ? 'bg-lime-500 text-white border-lime-600 '
                         : 'bg-zinc-50 dark:bg-zinc-800/80 border-zinc-200 dark:border-zinc-700/80 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                     }`}
                   >
                     +{formatUGX(amt)}
-                    {amt === 2000 && <span className="block text-xs font-normal opacity-90">Daily Min</span>}
+                    {amt === 2000 && <span className="block text-[9px] font-normal opacity-80">Min</span>}
                   </motion.button>
                 );
               })}
@@ -1013,7 +635,7 @@ Logs Recorded: ${payments.length} installments`;
 
             {/* Custom Amount Input */}
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -tranzinc-y-1/2 text-zinc-400 font-bold font-mono text-sm">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-zinc-500">
                 UGX
               </span>
               <input
@@ -1022,22 +644,20 @@ Logs Recorded: ${payments.length} installments`;
                 value={quickAmount}
                 onChange={(e) => setQuickAmount(e.target.value)}
                 placeholder="2,000"
-                className="w-full bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/80 rounded-surface pl-16 pr-4 py-3.5 text-zinc-900 dark:text-white font-mono text-base font-bold outline-none focus:ring-2 focus:ring-lime-500"
+                className="w-full rounded-surface border border-zinc-700 bg-zinc-950/60 py-2.5 pl-12 pr-3 text-sm font-bold text-white font-mono outline-none focus:ring-2 focus:ring-lime-500"
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-2">
             {/* Payment Method Selector - Defaults to Cash */}
             <div>
-              <label className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider block mb-2">
-                Payment Channel (Default: Cash)
-              </label>
+              <label className="mb-1 block text-[10px] font-medium text-zinc-500">Channel</label>
               <select
                 id="debt-payment-method-select"
                 value={selectedMethod}
                 onChange={(e) => setSelectedMethod(e.target.value as PaymentMethod)}
-                className="w-full bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/80 rounded-surface px-4 py-3 text-zinc-900 dark:text-white font-bold text-xs outline-none focus:ring-2 focus:ring-lime-500 cursor-pointer"
+                className="w-full rounded-surface border border-zinc-700 bg-zinc-950/60 px-2 py-2.5 text-xs font-semibold text-white outline-none focus:ring-2 focus:ring-lime-500"
               >
                 {PAYMENT_METHODS.map((m) => (
                   <option key={m.id} value={m.id}>
@@ -1049,32 +669,15 @@ Logs Recorded: ${payments.length} installments`;
 
             {/* Payment Date */}
             <div>
-              <label className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider block mb-2">
-                Payment Date
-              </label>
+              <label className="mb-1 block text-[10px] font-medium text-zinc-500">Date</label>
               <input
                 id="debt-payment-date-input"
                 type="date"
                 value={paymentDate}
                 onChange={(e) => setPaymentDate(e.target.value)}
-                className="w-full bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/80 rounded-surface px-4 py-3 text-zinc-900 dark:text-white font-mono text-xs font-bold outline-none focus:ring-2 focus:ring-lime-500"
+                className="w-full rounded-surface border border-zinc-700 bg-zinc-950/60 px-2 py-2.5 text-xs font-semibold text-white outline-none focus:ring-2 focus:ring-lime-500"
               />
             </div>
-          </div>
-
-          {/* Optional Note / Receipt Reference */}
-          <div>
-            <label className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider block mb-1">
-              Note or Receipt Reference (Optional)
-            </label>
-            <input
-              id="debt-payment-note-input"
-              type="text"
-              value={paymentNote}
-              onChange={(e) => setPaymentNote(e.target.value)}
-              placeholder="e.g. Daily office debt installment, Cash payment"
-              className="w-full bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/80 rounded-surface px-4 py-3 text-zinc-900 dark:text-white text-xs outline-none focus:ring-2 focus:ring-lime-500"
-            />
           </div>
 
           <motion.button
@@ -1083,16 +686,15 @@ Logs Recorded: ${payments.length} installments`;
             id="debt-save-payment-submit-btn"
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-lime-500 hover:bg-lime-600 active:scale-[0.99] text-white py-3.5 rounded-surface font-black text-sm uppercase tracking-wider  transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+            className="w-full rounded-surface bg-lime-400 py-2.5 text-sm font-bold text-zinc-950 transition-colors hover:bg-lime-300 disabled:opacity-50"
           >
-            <CheckCircle2 className="w-5 h-5" />
-            <span>Record Debt Payment</span>
+            <span>Record payment</span>
           </motion.button>
         </form>
       </div>
 
       {/* Grouped Transaction History (Collapsible: Today, Yesterday, This Week, Last Week, Earlier This Month, Last Month, Older) */}
-      <div className="bg-white dark:bg-zinc-900 rounded-surface sm:rounded-surface p-6 sm:p-8  border border-zinc-100 dark:border-zinc-800 transition-colors">
+      <div className="rounded-surface border border-zinc-800 bg-zinc-900/70 p-3 sm:p-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-zinc-100 dark:border-zinc-800">
           <div>
             <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">

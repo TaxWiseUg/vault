@@ -154,7 +154,6 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             <h3 id="category-goals-title" className="text-xl font-semibold tracking-tight">Savings goals</h3>
             <p className="mt-1 text-sm text-muted-foreground">Choose a goal to see its deposits and history.</p>
           </div>
-          <span className="text-xs text-muted-foreground">UGX</span>
         </div>
 
         <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
@@ -167,32 +166,30 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             const Icon = category.id === 'home_rent' ? Home : category.id === 'internet' ? Wifi : Briefcase;
 
             return (
-              <article key={category.id} id={`category-card-${category.id}`} className="flex flex-col rounded-surface border border-border bg-card p-4">
+              <article key={category.id} id={`category-card-${category.id}`} className="flex flex-col rounded-surface border border-border bg-card p-3 sm:p-4">
                 <button
                   type="button"
                   onClick={() => onSelectCategory(category.id)}
                   aria-label={`Open ${category.name} goal`}
                   className="w-full rounded-surface text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
-                  <div className="flex items-start justify-between gap-3">
-                    <span className="inline-flex size-10 items-center justify-center rounded-surface bg-muted text-foreground">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="inline-flex size-9 items-center justify-center rounded-surface bg-muted text-foreground">
                       <Icon aria-hidden="true" size={20} strokeWidth={1.8} />
                     </span>
-                    <span className="rounded-pill bg-muted px-2.5 py-1 text-xs font-mono-num tabular-nums font-medium text-foreground">
-                      {pct}%
-                    </span>
-                  </div>
-                  <div className="mt-3 flex items-center justify-between gap-2">
-                    <h4 className="text-base font-semibold">{category.name}</h4>
-                    <ChevronRight aria-hidden="true" size={16} strokeWidth={1.8} className="shrink-0 text-muted-foreground" />
-                  </div>
-                  <p className="mt-1 min-h-10 text-sm text-muted-foreground">{category.description}</p>
-                  <div className="mt-3 flex items-baseline justify-between gap-2">
-                    <strong className="font-mono-num tabular-nums text-xl font-semibold">{formatUGX(current)}</strong>
-                    <span className="text-sm text-muted-foreground">of {formatUGX(target)}</span>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <h4 className="truncate text-sm sm:text-base font-semibold">{category.name}</h4>
+                        <ChevronRight aria-hidden="true" size={16} strokeWidth={1.8} className="shrink-0 text-muted-foreground" />
+                      </div>
+                      <div className="mt-0.5 flex items-baseline justify-between gap-2">
+                        <strong className="font-mono-num tabular-nums text-lg font-semibold">{formatUGX(current)}</strong>
+                        <span className="text-xs text-muted-foreground">{pct}%</span>
+                      </div>
+                    </div>
                   </div>
                   <div
-                    className="mt-2 h-2 overflow-hidden rounded-pill bg-muted"
+                    className="mt-2 h-1.5 overflow-hidden rounded-pill bg-muted"
                     role="progressbar"
                     aria-label={`${category.name} progress`}
                     aria-valuemin={0}
@@ -201,7 +198,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                   >
                     <div className="h-full rounded-pill bg-primary transition-[width] duration-200 ease-out" style={{ width: `${pct}%` }} />
                   </div>
-                  <div className="mt-2 flex min-h-6 items-center justify-between gap-2 text-sm">
+                  <div className="mt-1.5 flex items-center justify-between gap-2 text-xs">
                     {complete ? (
                       <span className="inline-flex items-center gap-1 font-medium text-success">
                         <Check aria-hidden="true" size={16} strokeWidth={1.8} /> Goal reached
@@ -209,22 +206,22 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                     ) : (
                       <span className="font-medium text-muted-foreground">{formatUGX(remaining)} left</span>
                     )}
-                    <span className="text-xs text-muted-foreground">Target {formatUGX(target)}</span>
+                    <span className="text-muted-foreground">Target {formatUGX(target)}</span>
                   </div>
                 </button>
 
-                <div className="mt-4 grid grid-cols-3 gap-2 border-t border-border pt-3">
+                <div className="mt-2 grid grid-cols-3 gap-1.5 border-t border-border pt-2">
                   <button
                     type="button"
                     onClick={() => onQuickAdd(category.id, 5000)}
-                    className="min-h-11 rounded-surface border border-border px-2 text-xs font-medium text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="min-h-9 rounded-surface border border-border px-1.5 text-[11px] font-medium text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     +{formatUGX(5000)}
                   </button>
                   <button
                     type="button"
                     onClick={() => onQuickAdd(category.id, 10000)}
-                    className="min-h-11 rounded-surface border border-border px-2 text-xs font-medium text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="min-h-9 rounded-surface border border-border px-1.5 text-[11px] font-medium text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     +{formatUGX(10000)}
                   </button>
@@ -233,7 +230,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                     onClick={() => onOpenAddModal(category.id)}
                     aria-label={`Custom deposit to ${category.name}`}
                     title="Custom deposit amount"
-                    className="inline-flex min-h-11 items-center justify-center gap-1 rounded-surface border border-border px-2 text-xs font-medium text-primary hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="inline-flex min-h-9 items-center justify-center gap-1 rounded-surface border border-border px-1.5 text-[11px] font-medium text-primary hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     <Plus aria-hidden="true" size={16} strokeWidth={1.8} />
                     Custom
