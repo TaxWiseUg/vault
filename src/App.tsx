@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { onAuthStateChanged } from 'firebase/auth';
 import {
   auth,
@@ -32,7 +32,8 @@ import {
   resetDebtPaidProgressInDb,
   updateCategoryTargetInDb,
   resetCategoryProgressInDb,
-  clearLocalData,
+  prepareLocalDataForUser,
+  clearOwnedLocalData,
 } from './lib/firebase';
 import {
   CategoryGoal,
@@ -48,7 +49,7 @@ import {
 import { DEFAULT_CATEGORIES, DEFAULT_OFFICE_DEBT, formatUGX } from './lib/constants';
 import { Navbar } from './components/Navbar';
 import { CategoryTabs, ActiveTab } from './components/CategoryTabs';
-import { DesktopSidebar } from './components/DesktopSidebar';
+import { FloatingNav } from './components/FloatingNav';
 import { CommandPaletteModal } from './components/CommandPaletteModal';
 import { KeyboardShortcutsModal } from './components/KeyboardShortcutsModal';
 import { OverviewView } from './components/OverviewView';
@@ -56,7 +57,6 @@ import { CategoryDetailView } from './components/CategoryDetailView';
 import { HistoryLedger } from './components/HistoryLedger';
 import { ExpensesView } from './components/ExpensesView';
 import { OfficeDebtView } from './components/OfficeDebtView';
-import { AiCoachView } from './components/AiCoachView';
 import { QuickAddModal } from './components/QuickAddModal';
 import { EditEntryModal } from './components/EditEntryModal';
 import { AddExpenseModal } from './components/AddExpenseModal';
@@ -65,19 +65,10 @@ import { AuthModal } from './components/AuthModal';
 import { SettingsModal } from './components/SettingsModal';
 import { NotificationModal } from './components/NotificationModal';
 import { useNotifications } from './context/NotificationContext';
-import {
-  Plus,
-  LayoutDashboard,
-  Home,
-  Wifi,
-  Briefcase,
-  History,
-  Sparkles,
-  Receipt,
-} from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 export default function App() {
+  const reduceMotion = useReducedMotion();
   const { addNotification } = useNotifications();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [categories, setCategories] = useState<Record<CategoryId, CategoryGoal>>(getLocalCategories());
@@ -112,10 +103,22 @@ export default function App() {
     }, 3000);
   };
 
+  const isAnyOverlayOpen =
+    isAddExpenseModalOpen ||
+    isEditExpenseModalOpen ||
+    isAddModalOpen ||
+    isEditModalOpen ||
+    isAuthModalOpen ||
+    isSettingsOpen ||
+    isNotificationOpen ||
+    isCommandPaletteOpen ||
+    isShortcutsOpen;
+
   // Auth observer
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
+        prepareLocalDataForUser(firebaseUser.uid);
         const profile: UserProfile = {
           uid: firebaseUser.uid,
           displayName: firebaseUser.displayName,
@@ -125,6 +128,7 @@ export default function App() {
         };
         setUser(profile);
       } else {
+        clearOwnedLocalData();
         setUser(null);
       }
     });
@@ -306,7 +310,7 @@ export default function App() {
     const willReachGoal = (cat.currentAmount || 0) + amount >= cat.targetAmount;
 
     if (willReachGoal) {
-      confetti({
+      if (!reduceMotion) confetti({
         particleCount: 75,
         spread: 65,
         origin: { y: 0.6 },
@@ -483,7 +487,7 @@ export default function App() {
         colors: ['#F59E0B', '#10B981', '#6366F1'],
       });
       addNotification(
-        '🎉 Office Debt Fully Cleared!',
+        'Office debt fully cleared.',
         `Incredible milestone! You have completely paid off the ${formatUGX(synchronizedDebt.totalDebt)} office debt.`,
         'milestone',
         { actionTab: 'debt' }
@@ -576,18 +580,7 @@ export default function App() {
       }
 
       // If any modal is open, don't trigger background single-key shortcuts
-      const isAnyModalOpen =
-        isAddExpenseModalOpen ||
-        isEditExpenseModalOpen ||
-        isAddModalOpen ||
-        isEditModalOpen ||
-        isAuthModalOpen ||
-        isSettingsOpen ||
-        isNotificationOpen ||
-        isCommandPaletteOpen ||
-        isShortcutsOpen;
-
-      if (isAnyModalOpen) return;
+      if (isAnyOverlayOpen) return;
 
       // Ignore if user is currently typing in an input or textarea
       const target = e.target as HTMLElement | null;
@@ -627,8 +620,6 @@ export default function App() {
         setActiveTab('expenses');
       } else if (e.key === '7') {
         setActiveTab('history');
-      } else if (e.key === '8') {
-        setActiveTab('ai');
       }
     };
 
@@ -644,33 +635,11 @@ export default function App() {
     isNotificationOpen,
     isCommandPaletteOpen,
     isShortcutsOpen,
+    isAnyOverlayOpen,
   ]);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-row font-sans transition-colors">
-      {/* Dedicated Desktop Left Sidebar (visible on lg+) */}
-      <DesktopSidebar
-        activeTab={activeTab}
-        onChangeTab={(tab) => setActiveTab(tab)}
-        categories={synchronizedCategories}
-        debt={synchronizedDebt}
-        categoriesProgress={categoriesProgress}
-        debtProgress={{
-          current: synchronizedDebt.paidAmount,
-          total: synchronizedDebt.totalDebt,
-          pct: Math.min(100, Math.round((synchronizedDebt.paidAmount / (synchronizedDebt.totalDebt || 1)) * 100)),
-        }}
-        expenseCount={expenses.length}
-        user={user}
-        onOpenAddModal={handleOpenAddModal}
-        onOpenAddExpenseModal={handleOpenAddExpenseModal}
-        onOpenSettings={() => setIsSettingsOpen(true)}
-        onOpenNotifications={() => setIsNotificationOpen(true)}
-        onOpenAuth={() => setIsAuthModalOpen(true)}
-        onOpenShortcuts={() => setIsShortcutsOpen(true)}
-        onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
-      />
-
+    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans transition-colors">
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 min-h-screen overflow-x-hidden">
         {/* Top Header Bar */}
@@ -681,11 +650,9 @@ export default function App() {
           onOpenNotifications={() => setIsNotificationOpen(true)}
           onOpenAuth={() => setIsAuthModalOpen(true)}
           onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
-          onOpenAddModal={handleOpenAddModal}
-          onOpenAddExpense={handleOpenAddExpenseModal}
         />
 
-        {/* Mobile & Tablet Horizontal Tab Navigation (hidden on lg+) */}
+        {/* Category and debt navigation */}
         <CategoryTabs
           activeTab={activeTab}
           onChangeTab={(tab) => setActiveTab(tab)}
@@ -695,7 +662,6 @@ export default function App() {
             total: synchronizedDebt.totalDebt,
             pct: Math.min(100, Math.round((synchronizedDebt.paidAmount / (synchronizedDebt.totalDebt || 1)) * 100)),
           }}
-          expenseCount={expenses.length}
         />
 
         {/* Toast Notification Banner */}
@@ -706,7 +672,7 @@ export default function App() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
-              className="fixed top-16 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-2xl bg-slate-900 dark:bg-indigo-600 text-white text-xs font-bold shadow-2xl border border-slate-800 dark:border-indigo-500"
+              className="fixed top-16 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-surface bg-zinc-900 dark:bg-indigo-600 text-white text-xs font-bold shadow-floating border border-zinc-800 dark:border-indigo-500"
             >
               {toastMessage}
             </motion.div>
@@ -714,7 +680,7 @@ export default function App() {
         </AnimatePresence>
 
         {/* Main Content Views */}
-        <main className="flex-1 pt-2">
+        <main className="app-main flex-1 pt-2">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
@@ -792,99 +758,19 @@ export default function App() {
                   onDeleteEntry={handleDeleteEntry}
                 />
               )}
-
-              {activeTab === 'ai' && (
-                <AiCoachView
-                  categories={synchronizedCategories}
-                  entries={entries}
-                  daysLeftInMonth={daysLeftInMonth}
-                  totalSaved={overview.totalSaved}
-                  totalTarget={overview.totalTarget}
-                />
-              )}
             </motion.div>
           </AnimatePresence>
         </main>
 
-        {/* Fixed Mobile Bottom Action Bar (hidden on desktop) */}
-        <nav id="mobile-bottom-nav" className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-t border-slate-200/80 dark:border-slate-800/90 px-3 py-2 sm:hidden shadow-lg transition-colors">
-          <div className="max-w-md mx-auto flex items-center justify-around gap-1">
-            <button
-              id="bottom-nav-overview"
-              onClick={() => setActiveTab('overview')}
-              className={`flex flex-col items-center justify-center p-1 rounded-xl text-[10px] font-bold transition-colors flex-1 ${
-                activeTab === 'overview'
-                  ? 'text-indigo-600 dark:text-indigo-400'
-                  : 'text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300'
-              }`}
-            >
-              <LayoutDashboard className="w-5 h-5 mb-0.5" />
-              <span>Vault</span>
-            </button>
-
-            <button
-              id="bottom-nav-expenses"
-              onClick={() => setActiveTab('expenses')}
-              className={`flex flex-col items-center justify-center p-1 rounded-xl text-[10px] font-bold transition-colors flex-1 ${
-                activeTab === 'expenses'
-                  ? 'text-rose-600 dark:text-rose-400'
-                  : 'text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300'
-              }`}
-            >
-              <Receipt className="w-5 h-5 mb-0.5" />
-              <span>Expenses</span>
-            </button>
-
-            {/* Floating Central Quick Add Button */}
-            <div className="flex-1 flex justify-center -mt-6">
-              <button
-                id="central-floating-add-btn"
-                onClick={() => {
-                  if (activeTab === 'expenses') {
-                    handleOpenAddExpenseModal();
-                  } else {
-                    handleOpenAddModal(
-                      activeTab !== 'overview' && activeTab !== 'history' && activeTab !== 'ai' && activeTab !== 'debt'
-                        ? (activeTab as CategoryId)
-                        : undefined
-                    );
-                  }
-                }}
-                className="w-13 h-13 rounded-full bg-slate-900 hover:bg-slate-800 dark:bg-indigo-600 dark:hover:bg-indigo-500 text-white font-black flex items-center justify-center shadow-xl border-4 border-white dark:border-slate-900 transition-transform active:scale-95"
-                title="Record Transaction"
-              >
-                <Plus className="w-6 h-6 stroke-[3]" />
-              </button>
-            </div>
-
-            <button
-              id="bottom-nav-ledger"
-              onClick={() => setActiveTab('history')}
-              className={`flex flex-col items-center justify-center p-1 rounded-xl text-[10px] font-bold transition-colors flex-1 ${
-                activeTab === 'history'
-                  ? 'text-indigo-600 dark:text-indigo-400'
-                  : 'text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300'
-              }`}
-            >
-              <History className="w-5 h-5 mb-0.5" />
-              <span>Ledger</span>
-            </button>
-
-            <button
-              id="bottom-nav-ai"
-              onClick={() => setActiveTab('ai')}
-              className={`flex flex-col items-center justify-center p-1 rounded-xl text-[10px] font-bold transition-colors flex-1 ${
-                activeTab === 'ai'
-                  ? 'text-purple-600 dark:text-purple-400'
-                  : 'text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300'
-              }`}
-            >
-              <Sparkles className="w-5 h-5 mb-0.5" />
-              <span>AI Coach</span>
-            </button>
-          </div>
-        </nav>
       </div>
+
+      <FloatingNav
+        activeTab={activeTab}
+        onChangeTab={setActiveTab}
+        onOpenAdd={handleOpenAddModal}
+        onOpenExpense={handleOpenAddExpenseModal}
+        overlayOpen={isAnyOverlayOpen}
+      />
 
       {/* Quick Add Savings Modal */}
       <QuickAddModal
@@ -945,6 +831,10 @@ export default function App() {
         categories={synchronizedCategories}
         entries={entries}
         onAccountDeleted={handleAccountDeleted}
+        onOpenShortcuts={() => {
+          setIsSettingsOpen(false);
+          setIsShortcutsOpen(true);
+        }}
       />
 
       {/* Notifications & Preferences Modal */}
@@ -964,6 +854,7 @@ export default function App() {
         onOpenExpense={handleOpenAddExpenseModal}
         onOpenDebt={() => setActiveTab('debt')}
         onOpenSettings={() => setIsSettingsOpen(true)}
+        onOpenShortcuts={() => setIsShortcutsOpen(true)}
       />
 
       {/* Desktop Keyboard Shortcuts Modal (?) */}

@@ -91,21 +91,6 @@ export interface BudgetOverview {
   requiredDailyRateTotal: number;
 }
 
-export interface AICoachResponse {
-  headline: string;
-  pacingAssessment: 'ahead' | 'on_track' | 'needs_attention' | 'critical';
-  pacingSummary: string;
-  categoryBreakdown: {
-    categoryId: CategoryId;
-    status: string;
-    remaining: number;
-    recommendedDailyUGX: number;
-    tip: string;
-  }[];
-  quickMilestones: string[];
-  smartMoneyTips: string[];
-}
-
 export interface DebtGoal {
   id: string;
   name: string;
@@ -140,7 +125,7 @@ export interface AppNotification {
   timestamp: number;
   read: boolean;
   categoryId?: CategoryId;
-  actionTab?: 'overview' | CategoryId | 'expenses' | 'debt' | 'history' | 'ai';
+  actionTab?: 'overview' | CategoryId | 'expenses' | 'debt' | 'history';
 }
 
 export interface NotificationPreferences {

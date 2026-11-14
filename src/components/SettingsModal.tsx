@@ -21,6 +21,7 @@ import {
   AlertCircle,
   Trash2,
   AlertTriangle,
+  Keyboard,
 } from 'lucide-react';
 import { UserProfile, CategoryGoal, CategoryId, SavingsEntry } from '../types';
 import { useTheme, ThemeMode } from '../context/ThemeContext';
@@ -45,6 +46,7 @@ interface SettingsModalProps {
   categories: Record<CategoryId, CategoryGoal>;
   entries: SavingsEntry[];
   onAccountDeleted?: () => void;
+  onOpenShortcuts: () => void;
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -54,6 +56,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   categories,
   entries,
   onAccountDeleted,
+  onOpenShortcuts,
 }) => {
   useLockBodyScroll(isOpen);
 
@@ -238,7 +241,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-900/60 dark:bg-black/75 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-zinc-900/60 dark:bg-black/75 p-0 sm:p-4 animate-in fade-in duration-200"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -250,17 +253,17 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         id="settings-modal"
         onMouseDown={(e) => e.stopPropagation()}
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-t-[36px] sm:rounded-[40px] p-6 sm:p-8 shadow-2xl border border-slate-100 dark:border-slate-800 space-y-6 max-h-[90vh] overflow-y-auto transition-colors"
+        className="w-full max-w-lg bg-white dark:bg-zinc-900 rounded-surface p-6 sm:p-8 shadow-floating border border-zinc-100 dark:border-zinc-800 space-y-6 max-h-[90vh] overflow-y-auto transition-colors"
       >
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
+        <div className="flex items-center justify-between pb-4 border-b border-zinc-100 dark:border-zinc-800">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+            <div className="w-11 h-11 rounded-surface bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
               <Settings className="w-5 h-5 pointer-events-none" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">Settings & Account</h3>
-              <p className="text-xs text-slate-400 dark:text-slate-500">
+              <h3 className="text-lg font-bold text-zinc-900 dark:text-white">Settings & Account</h3>
+              <p className="text-xs text-zinc-400 dark:text-zinc-500">
                 Preferences, cloud backup & data management
               </p>
             </div>
@@ -275,7 +278,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               onClose();
             }}
             aria-label="Close modal"
-            className="p-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors cursor-pointer active:scale-95"
+            className="p-2.5 rounded-surface bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors cursor-pointer active:scale-95"
           >
             <X className="w-4 h-4 pointer-events-none" />
           </button>
@@ -283,14 +286,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
         {/* Sync / Notification Status Banner */}
         {syncStatus && (
-          <div className="p-3.5 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-900/60 text-indigo-700 dark:text-indigo-300 text-xs font-bold text-center animate-in fade-in">
+          <div className="p-3.5 rounded-surface bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-900/60 text-indigo-700 dark:text-indigo-300 text-xs font-bold text-center animate-in fade-in">
             {syncStatus}
           </div>
         )}
 
         {/* Error Banner */}
         {errorMessage && (
-          <div className="p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/60 border border-rose-100 dark:border-rose-900/60 text-rose-700 dark:text-rose-300 text-xs flex items-start gap-2.5 animate-in fade-in">
+          <div className="p-3.5 rounded-surface bg-rose-50 dark:bg-rose-950/60 border border-rose-100 dark:border-rose-900/60 text-rose-700 dark:text-rose-300 text-xs flex items-start gap-2.5 animate-in fade-in">
             <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-500" />
             <div className="flex-1 leading-relaxed">{errorMessage}</div>
           </div>
@@ -298,9 +301,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
         {/* Delete Account Confirmation Modal */}
         {showDeleteModal && (
-          <div className="p-5 rounded-3xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-900/80 space-y-4 animate-in zoom-in-95">
+          <div className="p-5 rounded-surface bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-900/80 space-y-4 animate-in zoom-in-95">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-rose-600 text-white flex items-center justify-center shrink-0 shadow-md">
+              <div className="w-10 h-10 rounded-surface bg-rose-600 text-white flex items-center justify-center shrink-0 ">
                 <AlertTriangle className="w-5 h-5" />
               </div>
               <div>
@@ -318,7 +321,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </p>
 
             <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-rose-800 dark:text-rose-300 block">
+              <label className="text-xs font-bold text-rose-800 dark:text-rose-300 block">
                 Type <span className="font-mono font-black text-rose-600 dark:text-rose-400">DELETE</span> to confirm:
               </label>
               <input
@@ -327,7 +330,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 value={deleteConfirmText}
                 onChange={(e) => setDeleteConfirmText(e.target.value)}
                 placeholder="DELETE"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-rose-300 dark:border-rose-800 bg-white dark:bg-slate-900 text-rose-900 dark:text-rose-200 text-xs font-mono font-bold focus:outline-none focus:ring-2 focus:ring-rose-500"
+                className="w-full px-3.5 py-2.5 rounded-surface border border-rose-300 dark:border-rose-800 bg-white dark:bg-zinc-900 text-rose-900 dark:text-rose-200 text-xs font-mono font-bold focus:outline-none focus:ring-2 focus:ring-rose-500"
               />
             </div>
 
@@ -338,7 +341,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   setShowDeleteModal(false);
                   setDeleteConfirmText('');
                 }}
-                className="flex-1 py-2.5 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold"
+                className="flex-1 py-2.5 px-3 rounded-surface bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-bold"
               >
                 Cancel
               </button>
@@ -348,7 +351,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 type="button"
                 onClick={handleDeleteAccount}
                 disabled={deleteConfirmText !== 'DELETE' || isDeletingAccount}
-                className="flex-1 py-2.5 px-3 rounded-xl bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-md shadow-rose-600/20 active:scale-95"
+                className="flex-1 py-2.5 px-3 rounded-surface bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all  active:scale-95"
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 <span>{isDeletingAccount ? 'Deleting Everything...' : 'Delete My Account'}</span>
@@ -360,48 +363,48 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         {/* Section 1: Account & Cloud Backup */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+            <span className="text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
               Cloud Backup & Sync
             </span>
-            <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+            <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
               {user ? <Cloud className="w-3.5 h-3.5" /> : <CloudOff className="w-3.5 h-3.5 text-amber-500" />}
               <span>{user ? 'Firestore Active' : 'Local Storage'}</span>
             </span>
           </div>
 
           {user ? (
-            <div className="p-4 rounded-3xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 space-y-4">
+            <div className="p-4 rounded-surface bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-100 dark:border-zinc-800 space-y-4">
               <div className="flex items-center gap-3">
                 {user.photoURL ? (
                   <img
                     src={user.photoURL}
                     alt={user.displayName || 'User'}
-                    className="w-12 h-12 rounded-2xl border border-indigo-100 dark:border-indigo-900/60 object-cover shadow-sm"
+                    className="w-12 h-12 rounded-surface border border-indigo-100 dark:border-indigo-900/60 object-cover "
                     referrerPolicy="no-referrer"
                   />
                 ) : (
-                  <div className="w-12 h-12 rounded-2xl bg-indigo-600 text-white font-bold text-lg flex items-center justify-center shadow-sm">
+                  <div className="w-12 h-12 rounded-surface bg-indigo-600 text-white font-bold text-lg flex items-center justify-center ">
                     {user.displayName?.[0]?.toUpperCase() || 'V'}
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-bold text-slate-900 dark:text-white truncate">
+                  <div className="text-sm font-bold text-zinc-900 dark:text-white truncate">
                     {user.displayName || 'Vault User'}
                   </div>
-                  <div className="text-xs text-slate-400 dark:text-slate-500 truncate">
+                  <div className="text-xs text-zinc-400 dark:text-zinc-500 truncate">
                     {user.isAnonymous ? 'Guest Cloud Member' : user.email}
                   </div>
-                  <div className="text-[10px] text-slate-500 dark:text-slate-400 font-mono-num mt-0.5">
+                  <div className="text-xs text-zinc-500 dark:text-zinc-400 font-mono-num mt-0.5">
                     {entries.length} savings entries stored
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 pt-2 border-t border-slate-200/60 dark:border-slate-700/60">
+              <div className="flex items-center gap-2 pt-2 border-t border-zinc-200/60 dark:border-zinc-700/60">
                 <button
                   onClick={handleManualSync}
                   disabled={isSyncing}
-                  className="flex-1 py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-indigo-600 dark:hover:bg-indigo-500 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-[0.98]"
+                  className="flex-1 py-2.5 px-3 rounded-surface bg-zinc-900 hover:bg-zinc-800 dark:bg-indigo-600 dark:hover:bg-indigo-500 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all  active:scale-[0.98]"
                 >
                   <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
                   <span>Sync Now</span>
@@ -409,7 +412,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <button
                   onClick={handleLogout}
                   disabled={isSyncing}
-                  className="py-2.5 px-3 rounded-xl bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-all"
+                  className="py-2.5 px-3 rounded-surface bg-zinc-200 hover:bg-zinc-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 text-zinc-700 dark:text-zinc-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-all"
                 >
                   <LogOut className="w-3.5 h-3.5" />
                   <span>Sign Out</span>
@@ -417,25 +420,25 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </div>
             </div>
           ) : (
-            <div className="p-4 rounded-3xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 space-y-3">
+            <div className="p-4 rounded-surface bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-100 dark:border-zinc-800 space-y-3">
               {/* Selector */}
-              <div className="grid grid-cols-2 p-1 rounded-2xl bg-slate-200/60 dark:bg-slate-700/60 text-xs font-bold text-slate-600 dark:text-slate-300">
+              <div className="grid grid-cols-2 p-1 rounded-surface bg-zinc-200/60 dark:bg-zinc-700/60 text-xs font-bold text-zinc-600 dark:text-zinc-300">
                 <button
                   onClick={() => setAuthMode('google')}
-                  className={`py-2 rounded-xl transition-all ${
+                  className={`py-2 rounded-surface transition-all ${
                     authMode === 'google'
-                      ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm'
-                      : 'hover:text-slate-900 dark:hover:text-white'
+                      ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white '
+                      : 'hover:text-zinc-900 dark:hover:text-white'
                   }`}
                 >
                   Google 1-Tap
                 </button>
                 <button
                   onClick={() => setAuthMode('email_login')}
-                  className={`py-2 rounded-xl transition-all ${
+                  className={`py-2 rounded-surface transition-all ${
                     authMode !== 'google'
-                      ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm'
-                      : 'hover:text-slate-900 dark:hover:text-white'
+                      ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white '
+                      : 'hover:text-zinc-900 dark:hover:text-white'
                   }`}
                 >
                   Email / Password
@@ -444,7 +447,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
               {authMode === 'google' ? (
                 <div className="space-y-3 pt-1">
-                  <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                  <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed">
                     Sign in with Google to sync your Home Rent, Internet, and Work Rent savings across all devices safely.
                   </p>
 
@@ -452,7 +455,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     id="settings-google-login-btn"
                     onClick={handleGoogleLogin}
                     disabled={isSyncing}
-                    className="w-full py-3.5 px-4 rounded-2xl bg-slate-900 hover:bg-slate-800 dark:bg-indigo-600 dark:hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-3 transition-all shadow-md active:scale-[0.98]"
+                    className="w-full py-3.5 px-4 rounded-surface bg-zinc-900 hover:bg-zinc-800 dark:bg-indigo-600 dark:hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-3 transition-all  active:scale-[0.98]"
                   >
                     <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                       <path
@@ -478,7 +481,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <div className="grid grid-cols-2 gap-2 pt-1">
                     <button
                       onClick={() => setAuthMode('email_login')}
-                      className="py-2.5 px-3 rounded-2xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-all"
+                      className="py-2.5 px-3 rounded-surface bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700/80 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-all"
                     >
                       <Mail className="w-3.5 h-3.5 text-indigo-500" />
                       <span>Use Email</span>
@@ -486,7 +489,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     <button
                       onClick={handleGuestLogin}
                       disabled={isSyncing}
-                      className="py-2.5 px-3 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 border border-indigo-100 dark:border-indigo-900 text-indigo-700 dark:text-indigo-300 text-xs font-bold flex items-center justify-center gap-1.5 transition-all"
+                      className="py-2.5 px-3 rounded-surface bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 border border-indigo-100 dark:border-indigo-900 text-indigo-700 dark:text-indigo-300 text-xs font-bold flex items-center justify-center gap-1.5 transition-all"
                     >
                       <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
                       <span>1-Tap Guest</span>
@@ -497,7 +500,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <form onSubmit={handleEmailAuth} className="space-y-3 pt-1">
                   {authMode === 'email_register' && (
                     <div>
-                      <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">
+                      <label className="block text-xs font-bold text-zinc-500 dark:text-zinc-400 mb-1">
                         Your Name
                       </label>
                       <input
@@ -505,41 +508,41 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="e.g. Partner Name"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-indigo-500 outline-none"
+                        className="w-full px-3.5 py-2.5 rounded-surface border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-indigo-500 outline-none"
                       />
                     </div>
                   )}
 
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">
+                    <label className="block text-xs font-bold text-zinc-500 dark:text-zinc-400 mb-1">
                       Email Address
                     </label>
                     <div className="relative">
-                      <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                      <Mail className="w-4 h-4 text-zinc-400 absolute left-3 top-3" />
                       <input
                         type="email"
                         required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="e.g. partner@example.com"
-                        className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-indigo-500 outline-none"
+                        className="w-full pl-9 pr-3.5 py-2.5 rounded-surface border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-indigo-500 outline-none"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">
+                    <label className="block text-xs font-bold text-zinc-500 dark:text-zinc-400 mb-1">
                       Password
                     </label>
                     <div className="relative">
-                      <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                      <Lock className="w-4 h-4 text-zinc-400 absolute left-3 top-3" />
                       <input
                         type="password"
                         required
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="•••••••• (min 6 characters)"
-                        className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-indigo-500 outline-none"
+                        className="w-full pl-9 pr-3.5 py-2.5 rounded-surface border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-indigo-500 outline-none"
                       />
                     </div>
                   </div>
@@ -547,7 +550,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <button
                     type="submit"
                     disabled={isSyncing}
-                    className="w-full py-3 px-4 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-md active:scale-[0.98]"
+                    className="w-full py-3 px-4 rounded-surface bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all  active:scale-[0.98]"
                   >
                     <LogIn className="w-4 h-4" />
                     <span>
@@ -580,7 +583,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     <button
                       type="button"
                       onClick={() => setAuthMode('google')}
-                      className="text-slate-400 dark:text-slate-500 hover:underline text-[11px]"
+                      className="text-zinc-400 dark:text-zinc-500 hover:underline text-xs"
                     >
                       Use Google
                     </button>
@@ -593,7 +596,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
         {/* Section 2: Appearance & Theme Mode */}
         <div className="space-y-3">
-          <div className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+          <div className="text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
             Appearance & Theme
           </div>
 
@@ -612,10 +615,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   key={t.id}
                   id={`settings-theme-${t.id}`}
                   onClick={() => setThemeMode(t.id)}
-                  className={`p-3.5 rounded-2xl border text-center flex flex-col items-center justify-center gap-2 transition-all ${
+                  className={`p-3.5 rounded-surface border text-center flex flex-col items-center justify-center gap-2 transition-all ${
                     isSelected
-                      ? 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-500 text-indigo-600 dark:text-indigo-400 font-bold shadow-sm'
-                      : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600'
+                      ? 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-500 text-indigo-600 dark:text-indigo-400 font-bold '
+                      : 'bg-zinc-50 dark:bg-zinc-800/60 border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:border-zinc-300 dark:hover:border-zinc-600'
                   }`}
                 >
                   <Icon className="w-5 h-5" />
@@ -624,20 +627,29 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               );
             })}
           </div>
+
+          <button
+            type="button"
+            onClick={onOpenShortcuts}
+            className="flex min-h-11 w-full items-center justify-between rounded-surface border border-zinc-200 bg-white px-4 py-3 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
+          >
+            <span className="flex items-center gap-2"><Keyboard aria-hidden="true" className="h-4 w-4" /> Keyboard shortcuts</span>
+            <span className="font-mono-num text-xs text-zinc-500">?</span>
+          </button>
         </div>
 
         {/* Section 3: Data & Export */}
         <div className="space-y-3">
-          <div className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+          <div className="text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
             Data & Export
           </div>
 
-          <div className="p-4 rounded-3xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 flex items-center justify-between gap-4">
+          <div className="p-4 rounded-surface bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-100 dark:border-zinc-800 flex items-center justify-between gap-4">
             <div>
-              <div className="text-xs font-bold text-slate-900 dark:text-white">
+              <div className="text-xs font-bold text-zinc-900 dark:text-white">
                 Export Savings Ledger
               </div>
-              <div className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">
+              <div className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">
                 Download all records as a CSV spreadsheet
               </div>
             </div>
@@ -645,7 +657,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <button
               onClick={exportCSV}
               disabled={entries.length === 0}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-indigo-600 dark:hover:bg-indigo-500 disabled:opacity-40 text-white text-xs font-bold uppercase tracking-wider transition-colors shrink-0 shadow-sm"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-surface bg-zinc-900 hover:bg-zinc-800 dark:bg-indigo-600 dark:hover:bg-indigo-500 disabled:opacity-40 text-white text-xs font-bold uppercase tracking-wider transition-colors shrink-0 "
             >
               <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-400" />
               <span>Export CSV</span>
@@ -659,12 +671,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             Danger Zone
           </div>
 
-          <div className="p-4 rounded-3xl bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200/80 dark:border-rose-900/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="p-4 rounded-surface bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200/80 dark:border-rose-900/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <div className="text-xs font-bold text-rose-900 dark:text-rose-300">
                 {user ? 'Delete Account & All Data' : 'Reset Database & Clear All Data'}
               </div>
-              <div className="text-[11px] text-rose-700/80 dark:text-rose-400/80 mt-0.5">
+              <div className="text-xs text-rose-700/80 dark:text-rose-400/80 mt-0.5">
                 Permanently erase all {entries.length} savings entries, targets, and account access
               </div>
             </div>
@@ -672,7 +684,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <button
               id="open-delete-account-modal-btn"
               onClick={() => setShowDeleteModal(true)}
-              className="py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all shrink-0 shadow-sm"
+              className="py-2.5 px-4 rounded-surface bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all shrink-0 "
             >
               <Trash2 className="w-3.5 h-3.5" />
               <span>{user ? 'Delete Account' : 'Clear All Data'}</span>
@@ -681,24 +693,24 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
 
         {/* Section 5: Vault App Summary Info */}
-        <div className="p-4 rounded-3xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/80 space-y-3">
-          <div className="flex items-center gap-3 pb-2 border-b border-slate-200/60 dark:border-slate-800">
-            <div className="w-10 h-10 rounded-2xl overflow-hidden shadow-sm shrink-0 border border-indigo-100 dark:border-indigo-900/60">
+        <div className="p-4 rounded-surface bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800/80 space-y-3">
+          <div className="flex items-center gap-3 pb-2 border-b border-zinc-200/60 dark:border-zinc-800">
+            <div className="w-10 h-10 rounded-surface overflow-hidden  shrink-0 border border-indigo-100 dark:border-indigo-900/60">
               <img src="/favicon.svg" alt="Vault Icon" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="font-extrabold text-xs text-slate-900 dark:text-white">Vault UGX</span>
-                <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400">v1.2</span>
+                <span className="font-extrabold text-xs text-zinc-900 dark:text-white">Vault UGX</span>
+                <span className="text-xs font-bold px-1.5 py-0.2 rounded bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400">v1.2</span>
               </div>
-              <p className="text-[11px] text-slate-400 dark:text-slate-500">Smart Daily Savings & Multi-Device Sync</p>
+              <p className="text-xs text-zinc-400 dark:text-zinc-500">Smart Daily Savings & Multi-Device Sync</p>
             </div>
           </div>
 
-          <div className="text-xs text-slate-500 dark:text-slate-400 space-y-1.5">
+          <div className="text-xs text-zinc-500 dark:text-zinc-400 space-y-1.5">
             <div className="flex items-center justify-between font-medium">
               <span>Total Saved This Cycle:</span>
-              <span className="font-mono-num font-bold text-slate-900 dark:text-white">
+              <span className="font-mono-num font-bold text-zinc-900 dark:text-white">
                 {formatUGX(totalSaved)}
               </span>
             </div>
@@ -708,7 +720,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
             <div className="flex items-center justify-between font-medium">
               <span>Categories Tracked:</span>
-              <span className="font-bold text-slate-800 dark:text-slate-200">
+              <span className="font-bold text-zinc-800 dark:text-zinc-200">
                 Home Rent (130k) • Internet (70k) • Work (100k)
               </span>
             </div>

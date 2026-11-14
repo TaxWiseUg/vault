@@ -35,20 +35,20 @@ export class ErrorBoundary extends React.Component<Props, State> {
   public render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-6 font-sans">
-          <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl p-7 border border-slate-200 dark:border-slate-800 shadow-xl space-y-4 text-center">
-            <div className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto">
+        <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center p-6 font-sans">
+          <div className="w-full max-w-md bg-white dark:bg-zinc-900 rounded-surface p-7 border border-zinc-200 dark:border-zinc-800  space-y-4 text-center">
+            <div className="w-12 h-12 rounded-surface bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto">
               <AlertTriangle className="w-6 h-6 stroke-[2.5]" />
             </div>
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+            <h2 className="text-lg font-bold text-zinc-900 dark:text-white">
               Something went wrong
             </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
               An unexpected display issue occurred. Your data is safe in your local storage and cloud database.
             </p>
             <button
               onClick={this.handleReset}
-              className="w-full py-3 px-4 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-md shadow-indigo-600/20 active:scale-95 cursor-pointer"
+              className="w-full py-3 px-4 rounded-surface bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all  active:scale-95 cursor-pointer"
             >
               <RefreshCw className="w-4 h-4" />
               <span>Reload Application</span>

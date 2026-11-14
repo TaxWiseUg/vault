@@ -8,12 +8,11 @@ import {
   Landmark,
   Receipt,
   History,
-  Sparkles,
   Plus,
   ArrowRight,
   Settings,
   X,
-  CreditCard,
+  Keyboard,
 } from 'lucide-react';
 import { ActiveTab } from './CategoryTabs';
 import { CategoryId } from '../types';
@@ -26,6 +25,7 @@ interface CommandPaletteModalProps {
   onOpenExpense: () => void;
   onOpenDebt: () => void;
   onOpenSettings: () => void;
+  onOpenShortcuts: () => void;
 }
 
 export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
@@ -36,6 +36,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
   onOpenExpense,
   onOpenDebt,
   onOpenSettings,
+  onOpenShortcuts,
 }) => {
   const [query, setQuery] = useState('');
 
@@ -148,17 +149,6 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
       },
     },
     {
-      id: 'nav-ai',
-      title: 'AI Financial Coach (Gemini)',
-      subtitle: 'Smart insights and budgeting advice',
-      icon: Sparkles,
-      category: 'Navigation',
-      action: () => {
-        onClose();
-        onSelectTab('ai');
-      },
-    },
-    {
       id: 'nav-settings',
       title: 'App Settings & Multi-Device Sync',
       subtitle: 'Account management, local backups & cloud sync',
@@ -167,6 +157,17 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
       action: () => {
         onClose();
         onOpenSettings();
+      },
+    },
+    {
+      id: 'keyboard-shortcuts',
+      title: 'Keyboard shortcuts',
+      subtitle: 'View navigation and action keys',
+      icon: Keyboard,
+      category: 'Preferences',
+      action: () => {
+        onClose();
+        onOpenShortcuts();
       },
     },
   ];
@@ -179,24 +180,24 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in">
-      <div className="bg-white dark:bg-slate-900 w-full max-w-xl rounded-[32px] shadow-2xl border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white overflow-hidden transition-colors">
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 p-4 bg-zinc-950/60 animate-in fade-in">
+      <div className="bg-white dark:bg-zinc-900 w-full max-w-xl rounded-surface shadow-floating border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white overflow-hidden transition-colors">
         {/* Search Input Bar */}
-        <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
-          <Search className="w-5 h-5 text-slate-400 shrink-0 ml-1" />
+        <div className="p-4 border-b border-zinc-100 dark:border-zinc-800 flex items-center gap-3">
+          <Search className="w-5 h-5 text-zinc-400 shrink-0 ml-1" />
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Type a command or jump to page... (e.g. Deposit, Debt, Rent)"
-            className="flex-1 bg-transparent border-none outline-none text-slate-900 dark:text-white placeholder:text-slate-400 text-sm font-medium"
+            className="flex-1 bg-transparent border-none outline-none text-zinc-900 dark:text-white placeholder:text-zinc-400 text-sm font-medium"
           />
-          <kbd className="hidden sm:inline px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[10px] font-mono font-bold">
+          <kbd className="hidden sm:inline px-2 py-0.5 rounded-surface bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 text-xs font-mono font-bold">
             ESC
           </kbd>
           <button
             onClick={onClose}
-            className="p-1 rounded-xl text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            className="p-1 rounded-surface text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -205,7 +206,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
         {/* Results List */}
         <div className="max-h-[60vh] overflow-y-auto p-3 space-y-1">
           {filtered.length === 0 ? (
-            <div className="py-12 text-center text-slate-400 dark:text-slate-500">
+            <div className="py-12 text-center text-zinc-400 dark:text-zinc-500">
               <p className="text-sm font-semibold">No commands matching "{query}"</p>
               <p className="text-xs mt-1">Try typing "deposit", "debt", "rent", or "expense".</p>
             </div>
@@ -216,23 +217,23 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
                 <button
                   key={item.id}
                   onClick={item.action}
-                  className="w-full flex items-center justify-between p-3 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800/70 text-left transition-colors group"
+                  className="w-full flex items-center justify-between p-3 rounded-surface hover:bg-zinc-100 dark:hover:bg-zinc-800/70 text-left transition-colors group"
                 >
                   <div className="flex items-center gap-3.5 min-w-0">
-                    <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-950/60 text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 flex items-center justify-center shrink-0 transition-colors">
+                    <div className="w-9 h-9 rounded-surface bg-zinc-100 dark:bg-zinc-800 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-950/60 text-zinc-600 dark:text-zinc-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 flex items-center justify-center shrink-0 transition-colors">
                       <Icon className="w-4 h-4" />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                      <p className="text-xs font-bold text-zinc-900 dark:text-white truncate">
                         {item.title}
                       </p>
-                      <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate">
+                      <p className="text-xs text-zinc-400 dark:text-zinc-500 truncate">
                         {item.subtitle}
                       </p>
                     </div>
                   </div>
 
-                  <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-slate-50 dark:bg-slate-950 shrink-0 group-hover:text-indigo-500 transition-colors">
+                  <span className="text-xs text-zinc-400 dark:text-zinc-500 font-bold uppercase tracking-wider px-2 py-0.5 rounded-surface bg-zinc-50 dark:bg-zinc-950 shrink-0 group-hover:text-indigo-500 transition-colors">
                     {item.category}
                   </span>
                 </button>
@@ -242,8 +243,8 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
         </div>
 
         {/* Footer Hint */}
-        <div className="p-3 bg-slate-50 dark:bg-slate-950/80 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-400 dark:text-slate-500">
-          <span>Use keyboard hotkeys <kbd className="font-mono text-[10px] px-1 bg-white dark:bg-slate-800 border rounded">D</kbd> for Deposit, <kbd className="font-mono text-[10px] px-1 bg-white dark:bg-slate-800 border rounded">E</kbd> for Expense</span>
+        <div className="p-3 bg-zinc-50 dark:bg-zinc-950/80 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-xs text-zinc-400 dark:text-zinc-500">
+          <span>Use keyboard hotkeys <kbd className="font-mono text-xs px-1 bg-white dark:bg-zinc-800 border rounded">D</kbd> for Deposit, <kbd className="font-mono text-xs px-1 bg-white dark:bg-zinc-800 border rounded">E</kbd> for Expense</span>
           <span>Vault Desktop</span>
         </div>
       </div>

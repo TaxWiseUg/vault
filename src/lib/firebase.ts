@@ -151,6 +151,44 @@ const LOCAL_ENTRIES_KEY = 'ugx_budget_entries_v1';
 const LOCAL_EXPENSES_KEY = 'ugx_budget_expenses_v1';
 const LOCAL_DEBT_GOAL_KEY = 'ugx_office_debt_goal_v1';
 const LOCAL_DEBT_PAYMENTS_KEY = 'ugx_office_debt_payments_v1';
+const LOCAL_OWNER_KEY = 'ugx_budget_owner_uid_v1';
+const LOCAL_DATA_KEYS = [
+  LOCAL_CATEGORIES_KEY,
+  LOCAL_ENTRIES_KEY,
+  LOCAL_EXPENSES_KEY,
+  LOCAL_DEBT_GOAL_KEY,
+  LOCAL_DEBT_PAYMENTS_KEY,
+] as const;
+
+function saveActiveLocalDataForOwner(userId: string) {
+  LOCAL_DATA_KEYS.forEach((key) => {
+    const value = localStorage.getItem(key);
+    if (value !== null) localStorage.setItem(`${key}:${userId}`, value);
+    localStorage.removeItem(key);
+  });
+  localStorage.removeItem(LOCAL_OWNER_KEY);
+}
+
+export function prepareLocalDataForUser(userId: string) {
+  const owner = localStorage.getItem(LOCAL_OWNER_KEY);
+  if (owner === userId) return;
+  if (owner) saveActiveLocalDataForOwner(owner);
+
+  const hasAccountCache = LOCAL_DATA_KEYS.some((key) => localStorage.getItem(`${key}:${userId}`) !== null);
+  if (hasAccountCache) {
+    LOCAL_DATA_KEYS.forEach((key) => {
+      localStorage.removeItem(key);
+      const value = localStorage.getItem(`${key}:${userId}`);
+      if (value !== null) localStorage.setItem(key, value);
+    });
+  }
+  localStorage.setItem(LOCAL_OWNER_KEY, userId);
+}
+
+export function clearOwnedLocalData() {
+  const owner = localStorage.getItem(LOCAL_OWNER_KEY);
+  if (owner) saveActiveLocalDataForOwner(owner);
+}
 
 export function getLocalCategories(): Record<CategoryId, CategoryGoal> {
   try {
@@ -262,11 +300,14 @@ export function saveLocalDebtPayments(payments: DebtPaymentEntry[]) {
 
 export function clearLocalData() {
   try {
+    const owner = localStorage.getItem(LOCAL_OWNER_KEY);
     localStorage.removeItem(LOCAL_CATEGORIES_KEY);
     localStorage.removeItem(LOCAL_ENTRIES_KEY);
     localStorage.removeItem(LOCAL_EXPENSES_KEY);
     localStorage.removeItem(LOCAL_DEBT_GOAL_KEY);
     localStorage.removeItem(LOCAL_DEBT_PAYMENTS_KEY);
+    localStorage.removeItem(LOCAL_OWNER_KEY);
+    if (owner) LOCAL_DATA_KEYS.forEach((key) => localStorage.removeItem(`${key}:${owner}`));
   } catch (e) {
     console.error('Failed to clear local data', e);
   }
@@ -355,6 +396,9 @@ export function subscribeToUserEntries(
         if (localEntries.length > 0) {
           syncLocalDataToFirestore(userId).then(() => {
             callback(localEntries);
+          }).catch((error) => {
+            console.error('Could not migrate local savings entries:', error);
+            callback(getLocalEntries());
           });
           return;
         }
@@ -388,6 +432,9 @@ export function subscribeToUserExpenses(
         if (localExpenses.length > 0) {
           syncLocalDataToFirestore(userId).then(() => {
             callback(localExpenses);
+          }).catch((error) => {
+            console.error('Could not migrate local expenses:', error);
+            callback(getLocalExpenses());
           });
           return;
         }
@@ -1130,6 +1177,11 @@ export async function resetCategoryProgressInDb(
 }
 
 export async function syncLocalDataToFirestore(userId: string) {
+  const owner = localStorage.getItem(LOCAL_OWNER_KEY);
+  if (owner && owner !== userId) {
+    throw new Error('Local data belongs to another account and cannot be synced.');
+  }
+
   try {
     const localCategories = getLocalCategories();
     const localEntries = getLocalEntries();
@@ -1137,11 +1189,11 @@ export async function syncLocalDataToFirestore(userId: string) {
     const localDebtGoal = getLocalDebtGoal();
     const localDebtPayments = getLocalDebtPayments();
 
-    const batch = writeBatch(db);
+    const writes: Array<(batch: ReturnType<typeof writeBatch>) => void> = [];
 
     for (const [key, category] of Object.entries(localCategories)) {
       const catRef = doc(db, 'users', userId, 'categories', key);
-      batch.set(
+      writes.push((batch) => batch.set(
         catRef,
         {
           id: category.id,
@@ -1151,59 +1203,65 @@ export async function syncLocalDataToFirestore(userId: string) {
           updatedAt: new Date().toISOString(),
         },
         { merge: true }
-      );
+      ));
     }
 
     for (const entry of localEntries) {
       const entryRef = doc(db, 'users', userId, 'entries', entry.id);
-      batch.set(
+      writes.push((batch) => batch.set(
         entryRef,
         {
           ...entry,
           userId,
         },
         { merge: true }
-      );
+      ));
     }
 
     for (const expense of localExpenses) {
       const expRef = doc(db, 'users', userId, 'expenses', expense.id);
-      batch.set(
+      writes.push((batch) => batch.set(
         expRef,
         {
           ...expense,
           userId,
         },
         { merge: true }
-      );
+      ));
     }
 
     // Sync office debt
     const debtRef = doc(db, 'users', userId, 'debt', 'office_debt');
-    batch.set(
+    writes.push((batch) => batch.set(
       debtRef,
       {
         ...localDebtGoal,
         updatedAt: new Date().toISOString(),
       },
       { merge: true }
-    );
+    ));
 
     for (const payment of localDebtPayments) {
       const payRef = doc(db, 'users', userId, 'debt_payments', payment.id);
-      batch.set(
+      writes.push((batch) => batch.set(
         payRef,
         {
           ...payment,
           userId,
         },
         { merge: true }
-      );
+      ));
     }
 
-    await batch.commit();
+    for (let offset = 0; offset < writes.length; offset += 450) {
+      const batch = writeBatch(db);
+      writes.slice(offset, offset + 450).forEach((write) => write(batch));
+      await batch.commit();
+    }
+    localStorage.setItem(LOCAL_OWNER_KEY, userId);
   } catch (e) {
     console.error('Error syncing local data to Firestore:', e);
+    throw e;
   }
 }
 
@@ -1211,46 +1269,26 @@ export async function syncLocalDataToFirestore(userId: string) {
  * Permanently deletes the user's Firestore data, local data, and Firebase auth account.
  */
 export async function deleteUserAccount(userId: string): Promise<void> {
-  // 1. Delete all user categories, entries, expenses, and debt in Firestore
-  try {
-    const categoriesSnapshot = await getDocs(collection(db, 'users', userId, 'categories'));
-    const entriesSnapshot = await getDocs(collection(db, 'users', userId, 'entries'));
-    const expensesSnapshot = await getDocs(collection(db, 'users', userId, 'expenses'));
-    const debtPaymentsSnapshot = await getDocs(collection(db, 'users', userId, 'debt_payments'));
+  const collections = ['categories', 'entries', 'expenses', 'debt_payments'] as const;
+  const refs = [];
 
+  for (const name of collections) {
+    const snapshot = await getDocs(collection(db, 'users', userId, name));
+    snapshot.forEach((item) => refs.push(item.ref));
+  }
+
+  refs.push(doc(db, 'users', userId, 'debt', 'office_debt'));
+  refs.push(doc(db, 'users', userId));
+
+  for (let offset = 0; offset < refs.length; offset += 450) {
     const batch = writeBatch(db);
-    categoriesSnapshot.forEach((docSnap) => {
-      batch.delete(docSnap.ref);
-    });
-    entriesSnapshot.forEach((docSnap) => {
-      batch.delete(docSnap.ref);
-    });
-    expensesSnapshot.forEach((docSnap) => {
-      batch.delete(docSnap.ref);
-    });
-    debtPaymentsSnapshot.forEach((docSnap) => {
-      batch.delete(docSnap.ref);
-    });
-
-    // Delete debt doc & user profile doc
-    batch.delete(doc(db, 'users', userId, 'debt', 'office_debt'));
-    batch.delete(doc(db, 'users', userId));
-
+    refs.slice(offset, offset + 450).forEach((ref) => batch.delete(ref));
     await batch.commit();
-  } catch (e) {
-    console.warn('Error deleting user documents from Firestore:', e);
   }
 
-  // 2. Clear local storage
+  if (auth.currentUser?.uid === userId) {
+    await deleteUser(auth.currentUser);
+  }
+
   clearLocalData();
-
-  // 3. Delete Firebase Auth user
-  if (auth.currentUser) {
-    try {
-      await deleteUser(auth.currentUser);
-    } catch (e: any) {
-      console.error('Error deleting Firebase auth user:', e);
-      throw e;
-    }
-  }
 }

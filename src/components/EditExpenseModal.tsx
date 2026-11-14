@@ -163,7 +163,7 @@ export const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-900/60 dark:bg-black/75 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-zinc-900/60 dark:bg-black/75 p-0 sm:p-4 animate-in fade-in duration-200"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -175,17 +175,17 @@ export const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
         id="edit-expense-modal"
         onMouseDown={(e) => e.stopPropagation()}
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-t-[36px] sm:rounded-[40px] shadow-2xl border border-slate-100 dark:border-slate-800 flex flex-col max-h-[90vh] transition-colors overflow-hidden"
+        className="w-full max-w-lg bg-white dark:bg-zinc-900 rounded-surface shadow-floating border border-zinc-100 dark:border-zinc-800 flex flex-col max-h-[90vh] transition-colors overflow-hidden"
       >
         {/* Header - Always visible at top */}
-        <div className="flex items-center justify-between p-6 pb-4 border-b border-slate-100 dark:border-slate-800 shrink-0 bg-white dark:bg-slate-900">
+        <div className="flex items-center justify-between p-6 pb-4 border-b border-zinc-100 dark:border-zinc-800 shrink-0 bg-white dark:bg-zinc-900">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center shadow-inner">
+            <div className="w-11 h-11 rounded-surface bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center ">
               <Receipt className="w-5 h-5 pointer-events-none" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">Edit Expense</h3>
-              <p className="text-xs text-slate-400 dark:text-slate-500">
+              <h3 className="text-lg font-bold text-zinc-900 dark:text-white">Edit Expense</h3>
+              <p className="text-xs text-zinc-400 dark:text-zinc-500">
                 Update amount, account deduction or note
               </p>
             </div>
@@ -200,7 +200,7 @@ export const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
               onClose();
             }}
             aria-label="Close modal"
-            className="p-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors cursor-pointer active:scale-95"
+            className="p-2.5 rounded-surface bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors cursor-pointer active:scale-95"
           >
             <X className="w-5 h-5 pointer-events-none" />
           </button>
@@ -211,11 +211,11 @@ export const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
           <div className="p-6 pt-4 overflow-y-auto space-y-5 flex-1">
           {/* Amount Input */}
           <div className="space-y-2">
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+            <label className="block text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
               Amount (UGX) <span className="text-rose-500">*</span>
             </label>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 font-bold font-mono text-sm">
+              <span className="absolute left-4 top-1/2 -tranzinc-y-1/2 text-zinc-400 dark:text-zinc-500 font-bold font-mono text-sm">
                 UGX
               </span>
               <input
@@ -228,14 +228,14 @@ export const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
                   setAmountStr(val ? parseInt(val, 10).toLocaleString('en-US') : '');
                 }}
                 placeholder="5,000"
-                className="w-full pl-16 pr-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-mono-num text-xl font-bold focus:ring-2 focus:ring-rose-500 outline-none transition-colors shadow-inner"
+                className="w-full pl-16 pr-4 py-3 rounded-surface border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white font-mono-num text-xl font-bold focus:ring-2 focus:ring-rose-500 outline-none transition-colors "
               />
             </div>
           </div>
 
           {/* Deducted From Account Selection */}
           <div className="space-y-2">
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+            <label className="block text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
               Deducted From Account / Vault
             </label>
 
@@ -251,27 +251,27 @@ export const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
                     key={accKey}
                     type="button"
                     onClick={() => setSourceAccount(accKey)}
-                    className={`p-3 rounded-2xl border text-left transition-all relative ${
+                    className={`p-3 rounded-surface border text-left transition-all relative ${
                       isSelected
-                        ? `${accMeta.badgeBg} ${accMeta.badgeDarkBg} border-rose-500 shadow-sm ring-2 ring-rose-500/20`
-                        : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                        ? `${accMeta.badgeBg} ${accMeta.badgeDarkBg} border-rose-500  ring-2 ring-rose-500/20`
+                        : 'bg-zinc-50 dark:bg-zinc-800/60 border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:border-zinc-300'
                     }`}
                   >
                     <div className="flex items-center gap-2">
                       <div
-                        className={`w-7 h-7 rounded-xl flex items-center justify-center shrink-0 ${
+                        className={`w-7 h-7 rounded-surface flex items-center justify-center shrink-0 ${
                           isSelected
                             ? 'bg-rose-600 text-white'
-                            : 'bg-slate-200/80 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
+                            : 'bg-zinc-200/80 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-400'
                         }`}
                       >
                         <AccIcon className="w-3.5 h-3.5" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                        <div className="text-xs font-bold text-zinc-900 dark:text-white truncate">
                           {accMeta.shortName}
                         </div>
-                        <div className="text-[10px] text-slate-400 truncate">
+                        <div className="text-xs text-zinc-400 truncate">
                           {vaultCat
                             ? `${formatUGX(vaultCat.currentAmount || 0)} saved`
                             : 'Out-of-pocket'}
@@ -290,7 +290,7 @@ export const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
 
             {/* Vault Deduction Toggle for Vault accounts */}
             {isVaultAccount && selectedVaultCategory && (
-              <div className="p-3 rounded-2xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-900/60">
+              <div className="p-3 rounded-surface bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-900/60">
                 <label className="flex items-center gap-2.5 cursor-pointer">
                   <input
                     type="checkbox"
@@ -308,7 +308,7 @@ export const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
 
           {/* Category Grid */}
           <div className="space-y-2">
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+            <label className="block text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
               Expense Category
             </label>
             <div className="grid grid-cols-3 gap-2">
@@ -321,22 +321,22 @@ export const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
                     key={cat.id}
                     type="button"
                     onClick={() => setCategory(cat.id)}
-                    className={`p-2.5 rounded-2xl border text-left flex items-center gap-2 transition-all ${
+                    className={`p-2.5 rounded-surface border text-left flex items-center gap-2 transition-all ${
                       isSelected
-                        ? 'bg-rose-50 dark:bg-rose-950/60 border-rose-500 text-rose-700 dark:text-rose-300 shadow-sm font-bold'
-                        : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600'
+                        ? 'bg-rose-50 dark:bg-rose-950/60 border-rose-500 text-rose-700 dark:text-rose-300  font-bold'
+                        : 'bg-zinc-50 dark:bg-zinc-800/60 border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:border-zinc-300 dark:hover:border-zinc-600'
                     }`}
                   >
                     <div
-                      className={`w-7 h-7 rounded-xl flex items-center justify-center shrink-0 ${
+                      className={`w-7 h-7 rounded-surface flex items-center justify-center shrink-0 ${
                         isSelected
                           ? 'bg-rose-600 text-white'
-                          : 'bg-slate-200/80 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
+                          : 'bg-zinc-200/80 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-400'
                       }`}
                     >
                       <IconComponent className="w-3.5 h-3.5" />
                     </div>
-                    <span className="text-[11px] truncate leading-tight">{cat.name}</span>
+                    <span className="text-xs truncate leading-tight">{cat.name}</span>
                   </button>
                 );
               })}
@@ -345,7 +345,7 @@ export const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
 
           {/* Payment Method */}
           <div className="space-y-2">
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+            <label className="block text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
               Payment Method
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -356,10 +356,10 @@ export const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
                     key={pm.id}
                     type="button"
                     onClick={() => setPaymentMethod(pm.id)}
-                    className={`py-2 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
+                    className={`py-2 px-3 rounded-surface border text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
                       isSelected
-                        ? 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-500 text-indigo-700 dark:text-indigo-300 shadow-sm'
-                        : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                        ? 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-500 text-indigo-700 dark:text-indigo-300 '
+                        : 'bg-zinc-50 dark:bg-zinc-800/60 border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:border-zinc-300'
                     }`}
                   >
                     <span className={`w-2 h-2 rounded-full ${pm.accentDot}`} />
@@ -372,43 +372,43 @@ export const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
 
           {/* Date Picker */}
           <div className="space-y-1.5">
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+            <label className="block text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
               Date
             </label>
             <div className="relative">
-              <Calendar className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Calendar className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -tranzinc-y-1/2" />
               <input
                 id="edit-expense-date-input"
                 type="date"
                 required
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-bold focus:ring-2 focus:ring-rose-500 outline-none"
+                className="w-full pl-10 pr-4 py-2.5 rounded-surface border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white text-xs font-bold focus:ring-2 focus:ring-rose-500 outline-none"
               />
             </div>
           </div>
 
           {/* Note Input */}
           <div className="space-y-1.5">
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+            <label className="block text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
               Description / Note
             </label>
             <div className="relative">
-              <FileText className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+              <FileText className="w-4 h-4 text-zinc-400 absolute left-3.5 top-3" />
               <input
                 id="edit-expense-note-input"
                 type="text"
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 placeholder="e.g. Boda ride, lunch..."
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-rose-500 outline-none"
+                className="w-full pl-10 pr-4 py-2.5 rounded-surface border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-rose-500 outline-none"
               />
             </div>
           </div>
 
           {/* Delete confirmation section */}
           {showDeleteConfirm ? (
-            <div className="p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-900/60 space-y-2.5">
+            <div className="p-3.5 rounded-surface bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-900/60 space-y-2.5">
               <p className="text-xs font-bold text-rose-800 dark:text-rose-300">
                 Are you sure you want to delete this expense record?
               </p>
@@ -417,14 +417,14 @@ export const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
                   type="button"
                   onClick={handleDelete}
                   disabled={isSubmitting}
-                  className="px-3.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold shadow transition-colors"
+                  className="px-3.5 py-1.5 rounded-surface bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold shadow transition-colors"
                 >
                   Yes, Delete
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowDeleteConfirm(false)}
-                  className="px-3.5 py-1.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold transition-colors"
+                  className="px-3.5 py-1.5 rounded-surface bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-bold transition-colors"
                 >
                   Cancel
                 </button>
@@ -435,12 +435,12 @@ export const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
           </div>
 
           {/* Sticky Footer: Action Buttons */}
-          <div className="p-4 sm:px-6 sm:py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/90 dark:bg-slate-900/90 backdrop-blur-sm shrink-0 flex items-center justify-between gap-3">
+          <div className="p-4 sm:px-6 sm:py-4 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50/90 dark:bg-zinc-900/90 shrink-0 flex items-center justify-between gap-3">
             {!showDeleteConfirm && (
               <button
                 type="button"
                 onClick={() => setShowDeleteConfirm(true)}
-                className="p-3 rounded-2xl bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-400 transition-colors cursor-pointer"
+                className="p-3 rounded-surface bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-400 transition-colors cursor-pointer"
                 title="Delete this expense"
               >
                 <Trash2 className="w-4 h-4 pointer-events-none" />
@@ -456,7 +456,7 @@ export const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
                   e.stopPropagation();
                   onClose();
                 }}
-                className="px-4 py-3 rounded-2xl bg-slate-200/80 hover:bg-slate-300/80 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer active:scale-95"
+                className="px-4 py-3 rounded-surface bg-zinc-200/80 hover:bg-zinc-300/80 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer active:scale-95"
               >
                 Cancel
               </button>
@@ -465,7 +465,7 @@ export const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
                 id="submit-update-expense-btn"
                 type="submit"
                 disabled={parsedAmount <= 0 || isSubmitting}
-                className="px-6 py-3.5 rounded-2xl bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-white font-black text-xs uppercase tracking-wider shadow-lg shadow-rose-600/25 active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer"
+                className="px-6 py-3.5 rounded-surface bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-white font-black text-xs uppercase tracking-wider  active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer"
               >
                 <Save className="w-4 h-4 pointer-events-none" />
                 <span>{isSubmitting ? 'Saving...' : 'Save Changes'}</span>
