@@ -1,8 +1,7 @@
 import React from 'react';
-import { Settings, Bell, Cloud, LogIn } from 'lucide-react';
+import { Settings, Cloud, LogIn } from 'lucide-react';
 import { UserProfile } from '../types';
 import { ActiveTab } from './CategoryTabs';
-import { useNotifications } from '../context/NotificationContext';
 
 interface NavbarProps {
   user: UserProfile | null;
@@ -21,8 +20,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenAuth,
   onOpenCommandPalette,
 }) => {
-  const { unreadCount } = useNotifications();
-
   const initials = user?.displayName
     ? user.displayName
         .split(' ')
@@ -60,9 +57,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               <h1 className="text-xl font-black text-zinc-900 dark:text-white tracking-tight">
                 Vault
               </h1>
-              <span className="text-xs uppercase tracking-wider font-extrabold px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/80">
-                UGX
-              </span>
             </div>
           </div>
         </div>
@@ -102,21 +96,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span className="sm:hidden">Sync</span>
             </button>
           )}
-
-          {/* Notification Button */}
-          <button
-            id="open-notifications-btn"
-            onClick={onOpenNotifications}
-            className="relative p-2.5 rounded-surface bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-800  hover:bg-zinc-50 dark:hover:bg-zinc-800/80 transition-all active:scale-95 group"
-            title="Notifications & Alerts"
-          >
-            <Bell className="w-4 h-4 text-zinc-500 dark:text-zinc-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors" />
-            {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-xs font-black flex items-center justify-center font-mono-num ">
-                {unreadCount > 9 ? '9+' : unreadCount}
-              </span>
-            )}
-          </button>
 
           {/* Settings Button */}
           <button
