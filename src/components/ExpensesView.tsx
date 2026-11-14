@@ -1,39 +1,30 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
-  Receipt,
-  Plus,
-  TrendingDown,
-  Calendar,
-  Search,
-  Filter,
-  Download,
-  UtensilsCrossed,
   Bike,
-  Zap,
-  ShoppingBag,
-  HeartPulse,
-  Sparkles,
   Briefcase,
-  Users,
-  MoreHorizontal,
+  CalendarDays,
+  CircleDot,
+  Download,
   Edit2,
-  Trash2,
-  ArrowDownRight,
-  PieChart as PieChartIcon,
-  CreditCard,
-  Smartphone,
-  Banknote,
-  DollarSign,
-  Layers,
-  ArrowUpRight,
-  TrendingUp,
-  Clock,
+  Gift,
+  HeartPulse,
   Home,
-  Wifi,
+  MoreHorizontal,
+  Plus,
+  Receipt,
+  Search,
+  ShoppingBag,
+  Smartphone,
+  TrendingDown,
+  TrendingUp,
+  Trash2,
+  UtensilsCrossed,
   Wallet,
-  Sparkle,
+  Wifi,
+  Zap,
 } from 'lucide-react';
-import {
+import type { LucideProps } from 'lucide-react';
+import type {
   CategoryGoal,
   CategoryId,
   ExpenseCategoryId,
@@ -45,9 +36,7 @@ import {
   EXPENSE_CATEGORIES,
   EXPENSE_SOURCE_ACCOUNTS,
   PAYMENT_METHODS,
-  QUICK_EXPENSE_PRESETS,
   formatUGX,
-  formatUGXShort,
 } from '../lib/constants';
 
 interface ExpensesViewProps {
@@ -59,29 +48,30 @@ interface ExpensesViewProps {
   onDeleteExpense: (expenseId: string) => void;
 }
 
-const CATEGORY_ICON_MAP: Record<ExpenseCategoryId, React.ComponentType<{ className?: string }>> = {
+const CATEGORY_ICON_MAP: Record<ExpenseCategoryId, React.ComponentType<LucideProps>> = {
   food_dining: UtensilsCrossed,
   transport_fuel: Bike,
   utilities_bills: Zap,
   shopping_groceries: ShoppingBag,
   health_medical: HeartPulse,
-  leisure_personal: Sparkles,
+  leisure_personal: CircleDot,
   business_work: Briefcase,
-  family_gifts: Users,
+  family_gifts: Gift,
   other: MoreHorizontal,
 };
 
-const ACCOUNT_ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
+const ACCOUNT_ICON_MAP: Record<string, React.ComponentType<LucideProps>> = {
   home: Home,
   wifi: Wifi,
   briefcase: Briefcase,
   wallet: Wallet,
 };
 
+type TimeFilter = 'month' | 'today' | 'week' | 'all';
+
 export const ExpensesView: React.FC<ExpensesViewProps> = ({
   expenses,
   totalSavedMonth,
-  categories,
   onOpenAddExpense,
   onOpenEditExpense,
   onDeleteExpense,
@@ -90,127 +80,85 @@ export const ExpensesView: React.FC<ExpensesViewProps> = ({
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<ExpenseCategoryId | 'all'>('all');
   const [selectedAccountFilter, setSelectedAccountFilter] = useState<ExpenseSourceAccount | 'all'>('all');
   const [selectedPaymentFilter, setSelectedPaymentFilter] = useState<PaymentMethod | 'all'>('all');
-  const [timeFilter, setTimeFilter] = useState<'month' | 'today' | 'week' | 'all'>('month');
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>('month');
 
-  // Dates for current month
   const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = String(now.getMonth() + 1).padStart(2, '0');
-  const currentMonthPrefix = `${currentYear}-${currentMonth}`;
+  const currentMonthPrefix = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   const todayStr = now.toISOString().split('T')[0];
+  const monthLabel = now.toLocaleDateString('en', { month: 'long' });
 
-  // Filtered expenses based on time and search
-  const filteredExpenses = useMemo(() => {
-    return expenses.filter((item) => {
-      // Time filter
-      if (timeFilter === 'month' && !item.date.startsWith(currentMonthPrefix)) {
-        return false;
-      }
-      if (timeFilter === 'today' && item.date !== todayStr) {
-        return false;
-      }
-      if (timeFilter === 'week') {
-        const itemDate = new Date(item.date);
-        const weekAgo = new Date();
-        weekAgo.setDate(now.getDate() - 7);
-        if (itemDate < weekAgo) return false;
-      }
+  const filteredExpenses = useMemo(() => expenses.filter((item) => {
+    if (timeFilter === 'month' && !item.date.startsWith(currentMonthPrefix)) return false;
+    if (timeFilter === 'today' && item.date !== todayStr) return false;
+    if (timeFilter === 'week') {
+      const itemDate = new Date(item.date);
+      const weekAgo = new Date();
+      weekAgo.setDate(now.getDate() - 7);
+      if (itemDate < weekAgo) return false;
+    }
 
-      // Account filter
-      if (selectedAccountFilter !== 'all') {
-        const acc = item.sourceAccount || 'general_wallet';
-        if (acc !== selectedAccountFilter) return false;
-      }
+    const accountId = item.sourceAccount || 'general_wallet';
+    if (selectedAccountFilter !== 'all' && accountId !== selectedAccountFilter) return false;
+    if (selectedCategoryFilter !== 'all' && item.category !== selectedCategoryFilter) return false;
+    if (selectedPaymentFilter !== 'all' && item.paymentMethod !== selectedPaymentFilter) return false;
 
-      // Category filter
-      if (selectedCategoryFilter !== 'all' && item.category !== selectedCategoryFilter) {
-        return false;
-      }
-
-      // Payment method filter
-      if (selectedPaymentFilter !== 'all' && item.paymentMethod !== selectedPaymentFilter) {
-        return false;
-      }
-
-      // Search query
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        const catName = EXPENSE_CATEGORIES[item.category]?.name.toLowerCase() || '';
-        const accName = item.sourceAccount
-          ? EXPENSE_SOURCE_ACCOUNTS[item.sourceAccount]?.name.toLowerCase()
-          : '';
-        const note = (item.note || '').toLowerCase();
-        const amtStr = item.amount.toString();
-        return catName.includes(q) || (accName && accName.includes(q)) || note.includes(q) || amtStr.includes(q);
-      }
-
-      return true;
-    });
-  }, [
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return true;
+    const categoryName = EXPENSE_CATEGORIES[item.category]?.name.toLowerCase() || '';
+    const accountName = EXPENSE_SOURCE_ACCOUNTS[accountId]?.name.toLowerCase() || '';
+    const paymentName = PAYMENT_METHODS.find((method) => method.id === item.paymentMethod)?.name.toLowerCase() || '';
+    return categoryName.includes(query) || accountName.includes(query) || paymentName.includes(query) ||
+      (item.note || '').toLowerCase().includes(query) || item.amount.toString().includes(query);
+  }), [
     expenses,
     timeFilter,
+    currentMonthPrefix,
+    todayStr,
+    now,
     selectedAccountFilter,
     selectedCategoryFilter,
     selectedPaymentFilter,
     searchQuery,
-    currentMonthPrefix,
-    todayStr,
   ]);
 
-  // Overall Stats
-  const thisMonthExpenses = useMemo(() => {
-    return expenses.filter((e) => e.date.startsWith(currentMonthPrefix));
-  }, [expenses, currentMonthPrefix]);
+  const thisMonthExpenses = useMemo(
+    () => expenses.filter((expense) => expense.date.startsWith(currentMonthPrefix)),
+    [expenses, currentMonthPrefix],
+  );
+  const totalSpentThisMonth = useMemo(
+    () => thisMonthExpenses.reduce((sum, expense) => sum + expense.amount, 0),
+    [thisMonthExpenses],
+  );
+  const todaySpent = useMemo(
+    () => expenses.filter((expense) => expense.date === todayStr).reduce((sum, expense) => sum + expense.amount, 0),
+    [expenses, todayStr],
+  );
+  const dailyAverageSpent = now.getDate() > 0 ? Math.round(totalSpentThisMonth / now.getDate()) : 0;
+  const netCashflow = totalSavedMonth - totalSpentThisMonth;
+  const filteredTotal = filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0);
 
-  const totalSpentThisMonth = useMemo(() => {
-    return thisMonthExpenses.reduce((sum, e) => sum + e.amount, 0);
-  }, [thisMonthExpenses]);
-
-  const todaySpent = useMemo(() => {
-    return expenses
-      .filter((e) => e.date === todayStr)
-      .reduce((sum, e) => sum + e.amount, 0);
-  }, [expenses, todayStr]);
-
-  const dayOfMonth = now.getDate();
-  const dailyAverageSpent = dayOfMonth > 0 ? Math.round(totalSpentThisMonth / dayOfMonth) : 0;
-
-  // Account breakdown calculations
   const accountStats = useMemo(() => {
-    const map: Record<ExpenseSourceAccount, { amount: number; count: number }> = {
+    const totals: Record<ExpenseSourceAccount, { amount: number; count: number }> = {
       home_rent: { amount: 0, count: 0 },
       internet: { amount: 0, count: 0 },
       work_rent: { amount: 0, count: 0 },
       general_wallet: { amount: 0, count: 0 },
     };
-
-    thisMonthExpenses.forEach((exp) => {
-      const acc = exp.sourceAccount || 'general_wallet';
-      if (map[acc]) {
-        map[acc].amount += exp.amount;
-        map[acc].count += 1;
-      }
+    thisMonthExpenses.forEach((expense) => {
+      const accountId = expense.sourceAccount || 'general_wallet';
+      totals[accountId].amount += expense.amount;
+      totals[accountId].count += 1;
     });
-
-    return (Object.keys(EXPENSE_SOURCE_ACCOUNTS) as ExpenseSourceAccount[])
-      .map((accKey) => {
-        const meta = EXPENSE_SOURCE_ACCOUNTS[accKey];
-        const data = map[accKey];
-        return {
-          id: accKey,
-          meta,
-          amount: data.amount,
-          count: data.count,
-          percentage: totalSpentThisMonth > 0 ? (data.amount / totalSpentThisMonth) * 100 : 0,
-        };
-      })
-      .filter((item) => item.amount > 0)
-      .sort((a, b) => b.amount - a.amount);
+    return (Object.keys(EXPENSE_SOURCE_ACCOUNTS) as ExpenseSourceAccount[]).map((id) => ({
+      id,
+      meta: EXPENSE_SOURCE_ACCOUNTS[id],
+      ...totals[id],
+      percentage: totalSpentThisMonth > 0 ? (totals[id].amount / totalSpentThisMonth) * 100 : 0,
+    }));
   }, [thisMonthExpenses, totalSpentThisMonth]);
 
-  // Category breakdown calculations
   const categoryStats = useMemo(() => {
-    const map: Record<ExpenseCategoryId, { amount: number; count: number }> = {
+    const totals: Record<ExpenseCategoryId, { amount: number; count: number }> = {
       food_dining: { amount: 0, count: 0 },
       transport_fuel: { amount: 0, count: 0 },
       utilities_bills: { amount: 0, count: 0 },
@@ -221,57 +169,42 @@ export const ExpensesView: React.FC<ExpensesViewProps> = ({
       family_gifts: { amount: 0, count: 0 },
       other: { amount: 0, count: 0 },
     };
-
-    thisMonthExpenses.forEach((exp) => {
-      if (map[exp.category]) {
-        map[exp.category].amount += exp.amount;
-        map[exp.category].count += 1;
-      }
+    thisMonthExpenses.forEach((expense) => {
+      totals[expense.category].amount += expense.amount;
+      totals[expense.category].count += 1;
     });
-
-    return Object.entries(map)
-      .map(([id, data]) => ({
+    return Object.entries(totals)
+      .map(([id, total]) => ({
         id: id as ExpenseCategoryId,
         meta: EXPENSE_CATEGORIES[id as ExpenseCategoryId],
-        amount: data.amount,
-        count: data.count,
-        percentage: totalSpentThisMonth > 0 ? (data.amount / totalSpentThisMonth) * 100 : 0,
+        ...total,
+        percentage: totalSpentThisMonth > 0 ? (total.amount / totalSpentThisMonth) * 100 : 0,
       }))
       .filter((item) => item.amount > 0)
       .sort((a, b) => b.amount - a.amount);
   }, [thisMonthExpenses, totalSpentThisMonth]);
 
-  // Payment method breakdown
   const paymentStats = useMemo(() => {
-    const map: Record<PaymentMethod, number> = {
+    const totals: Record<PaymentMethod, number> = {
       mtn_momo: 0,
       airtel_money: 0,
       cash: 0,
       bank_card: 0,
       other: 0,
     };
-
-    thisMonthExpenses.forEach((exp) => {
-      map[exp.paymentMethod] = (map[exp.paymentMethod] || 0) + exp.amount;
-    });
-
-    return PAYMENT_METHODS.map((pm) => ({
-      ...pm,
-      amount: map[pm.id],
-      percentage: totalSpentThisMonth > 0 ? (map[pm.id] / totalSpentThisMonth) * 100 : 0,
-    })).filter((pm) => pm.amount > 0);
+    thisMonthExpenses.forEach((expense) => { totals[expense.paymentMethod] += expense.amount; });
+    return PAYMENT_METHODS.map((method) => ({
+      ...method,
+      amount: totals[method.id],
+      percentage: totalSpentThisMonth > 0 ? (totals[method.id] / totalSpentThisMonth) * 100 : 0,
+    })).filter((method) => method.amount > 0);
   }, [thisMonthExpenses, totalSpentThisMonth]);
 
-  // Group filtered expenses by date
   const groupedExpenses = useMemo(() => {
-    const groups: { [date: string]: ExpenseEntry[] } = {};
-    filteredExpenses.forEach((exp) => {
-      if (!groups[exp.date]) {
-        groups[exp.date] = [];
-      }
-      groups[exp.date].push(exp);
+    const groups: Record<string, ExpenseEntry[]> = {};
+    filteredExpenses.forEach((expense) => {
+      (groups[expense.date] ||= []).push(expense);
     });
-
     return Object.keys(groups)
       .sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
       .map((date) => ({
@@ -281,561 +214,310 @@ export const ExpensesView: React.FC<ExpensesViewProps> = ({
       }));
   }, [filteredExpenses]);
 
-  // Export to CSV
   const handleExportCSV = () => {
     if (expenses.length === 0) return;
-
     const headers = ['Date', 'Category', 'Deducted From Account', 'Payment Method', 'Amount (UGX)', 'Vault Deducted', 'Note'];
-    const rows = expenses.map((e) => [
-      e.date,
-      EXPENSE_CATEGORIES[e.category]?.name || e.category,
-      EXPENSE_SOURCE_ACCOUNTS[e.sourceAccount || 'general_wallet']?.name || 'General Pocket',
-      PAYMENT_METHODS.find((p) => p.id === e.paymentMethod)?.name || e.paymentMethod,
-      e.amount,
-      e.deductFromVault ? 'Yes' : 'No',
-      `"${(e.note || '').replace(/"/g, '""')}"`,
+    const rows = expenses.map((expense) => [
+      expense.date,
+      EXPENSE_CATEGORIES[expense.category]?.name || expense.category,
+      EXPENSE_SOURCE_ACCOUNTS[expense.sourceAccount || 'general_wallet']?.name || 'General Wallet',
+      PAYMENT_METHODS.find((method) => method.id === expense.paymentMethod)?.name || expense.paymentMethod,
+      expense.amount,
+      expense.deductFromVault ? 'Yes' : 'No',
+      `"${(expense.note || '').replace(/"/g, '""')}"`,
     ]);
-
-    const csvContent =
-      'data:text/csv;charset=utf-8,' +
-      [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
-
-    const encodedUri = encodeURI(csvContent);
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((row) => row.join(','))].join('\n');
     const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
+    link.setAttribute('href', encodeURI(csvContent));
     link.setAttribute('download', `vault_expenses_${new Date().toISOString().split('T')[0]}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
-  const netCashflow = totalSavedMonth - totalSpentThisMonth;
+  const hasActiveFilters = Boolean(
+    searchQuery || timeFilter !== 'month' || selectedCategoryFilter !== 'all' ||
+    selectedAccountFilter !== 'all' || selectedPaymentFilter !== 'all'
+  );
+  const clearFilters = () => {
+    setSearchQuery('');
+    setTimeFilter('month');
+    setSelectedCategoryFilter('all');
+    setSelectedAccountFilter('all');
+    setSelectedPaymentFilter('all');
+  };
 
   return (
-    <div id="expenses-view-container" className="space-y-6 animate-in fade-in duration-200 pb-12">
-      {/* Top Banner & Main Metrics */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-        {/* Total Spent Card */}
-        <div className="p-5 rounded-[28px] bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm relative overflow-hidden transition-colors">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-              Total Spent ({now.toLocaleString('default', { month: 'short' })})
-            </span>
-            <div className="w-8 h-8 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center">
-              <TrendingDown className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="mt-3">
-            <h3 className="text-2xl sm:text-3xl font-black font-mono-num text-rose-600 dark:text-rose-400 tracking-tight">
-              {formatUGX(totalSpentThisMonth)}
-            </h3>
-            <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1 font-medium">
-              {thisMonthExpenses.length} transactions logged this month
-            </p>
-          </div>
+    <div id="expenses-view-container" className="w-full space-y-5 px-4 pb-8 sm:px-6">
+      <section aria-labelledby="expenses-title" className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 id="expenses-title" className="text-display font-semibold tracking-tight">Expenses</h2>
+          <p className="mt-1 text-sm text-muted-foreground">See where your money went and which account covered it.</p>
         </div>
+        <button
+          id="open-record-expense-btn"
+          type="button"
+          onClick={() => onOpenAddExpense()}
+          className="inline-flex min-h-11 items-center gap-2 rounded-surface bg-primary px-4 text-sm font-semibold text-primary-foreground hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <Plus aria-hidden="true" size={16} strokeWidth={1.8} /> Record expense
+        </button>
+      </section>
 
-        {/* Today's Spend */}
-        <div className="p-5 rounded-[28px] bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm relative overflow-hidden transition-colors">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-              Today's Spending
-            </span>
-            <div className="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-              <Clock className="w-4 h-4" />
-            </div>
+      <section aria-label="Expense summary" className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <article className="rounded-surface border border-border bg-card p-4">
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="text-sm font-medium text-muted-foreground">Spent in {monthLabel}</h3>
+            <TrendingDown aria-hidden="true" size={18} strokeWidth={1.8} className="text-destructive" />
           </div>
-          <div className="mt-3">
-            <h3 className="text-2xl sm:text-3xl font-black font-mono-num text-slate-900 dark:text-white tracking-tight">
-              {formatUGX(todaySpent)}
-            </h3>
-            <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1 font-medium">
-              Avg {formatUGX(dailyAverageSpent)} / day this month
-            </p>
+          <p className="mt-3 font-mono-num tabular-nums text-xl font-semibold text-destructive">{formatUGX(totalSpentThisMonth)}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{thisMonthExpenses.length} records</p>
+        </article>
+        <article className="rounded-surface border border-border bg-card p-4">
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="text-sm font-medium text-muted-foreground">Spent today</h3>
+            <CalendarDays aria-hidden="true" size={18} strokeWidth={1.8} className="text-muted-foreground" />
           </div>
-        </div>
+          <p className="mt-3 font-mono-num tabular-nums text-xl font-semibold">{formatUGX(todaySpent)}</p>
+          <p className="mt-1 text-sm text-muted-foreground">Average {formatUGX(dailyAverageSpent)} per day this month</p>
+        </article>
+        <article className="rounded-surface border border-border bg-card p-4">
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="text-sm font-medium text-muted-foreground">Saved less spent</h3>
+            {netCashflow >= 0
+              ? <TrendingUp aria-hidden="true" size={18} strokeWidth={1.8} className="text-success" />
+              : <TrendingDown aria-hidden="true" size={18} strokeWidth={1.8} className="text-destructive" />}
+          </div>
+          <p className={`mt-3 font-mono-num tabular-nums text-xl font-semibold ${netCashflow >= 0 ? 'text-success' : 'text-destructive'}`}>
+            {netCashflow >= 0 ? '+' : '−'}{formatUGX(Math.abs(netCashflow))}
+          </p>
+          <p className="mt-1 text-sm text-muted-foreground">Savings less this month’s expenses</p>
+        </article>
+        <article className="rounded-surface border border-border bg-card p-4">
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="text-sm font-medium text-muted-foreground">Filtered records</h3>
+            <Receipt aria-hidden="true" size={18} strokeWidth={1.8} className="text-muted-foreground" />
+          </div>
+          <p className="mt-3 font-mono-num tabular-nums text-xl font-semibold">{formatUGX(filteredTotal)}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{filteredExpenses.length} matching expenses</p>
+        </article>
+      </section>
 
-        {/* Savings vs Spending Balance */}
-        <div className="p-5 rounded-[28px] bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm relative overflow-hidden transition-colors">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-              Monthly Cashflow
-            </span>
-            <div
-              className={`w-8 h-8 rounded-xl flex items-center justify-center ${
-                netCashflow >= 0
-                  ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400'
-                  : 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400'
-              }`}
-            >
-              {netCashflow >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-            </div>
-          </div>
-          <div className="mt-3">
-            <h3
-              className={`text-2xl sm:text-3xl font-black font-mono-num tracking-tight ${
-                netCashflow >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
-              }`}
-            >
-              {netCashflow >= 0 ? `+${formatUGX(netCashflow)}` : `-${formatUGX(Math.abs(netCashflow))}`}
-            </h3>
-            <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1 font-medium">
-              Saved {formatUGXShort(totalSavedMonth)} vs Spent {formatUGXShort(totalSpentThisMonth)}
-            </p>
-          </div>
-        </div>
-
-        {/* Quick Action Box */}
-        <div className="p-5 rounded-[28px] bg-gradient-to-br from-rose-500 to-rose-600 text-white shadow-lg shadow-rose-500/20 flex flex-col justify-between">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-rose-100">
-              New Expense
-            </span>
-            <Receipt className="w-5 h-5 text-rose-200" />
-          </div>
-          <div className="mt-3">
-            <p className="text-xs text-rose-100 mb-3 font-medium">
-              Record payments with home rent, wifi, or work rent accounts.
-            </p>
-            <button
-              id="open-record-expense-btn"
-              onClick={() => onOpenAddExpense()}
-              className="w-full py-2.5 px-4 rounded-xl bg-white hover:bg-rose-50 text-rose-700 font-black text-xs uppercase tracking-wider shadow active:scale-95 transition-all flex items-center justify-center gap-2"
-            >
-              <Plus className="w-4 h-4 stroke-[3]" />
-              <span>Record Expense</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Analytics: Deducted Account Sources + Categories + Channels */}
       {thisMonthExpenses.length > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          {/* Deducted From Account Breakdown */}
-          <div className="p-6 rounded-[32px] bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm transition-colors space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
-              <div className="flex items-center gap-2.5">
-                <Wallet className="w-4 h-4 text-orange-600 dark:text-orange-400" />
-                <h4 className="text-sm font-bold text-slate-900 dark:text-white">
-                  Deducted From Accounts
-                </h4>
-              </div>
-              <span className="text-xs font-mono font-bold text-slate-400">
-                {accountStats.length} active
-              </span>
+        <section aria-label="Monthly expense breakdowns" className="grid grid-cols-1 gap-3 lg:grid-cols-3">
+          <article className="space-y-3 rounded-surface border border-border bg-card p-4">
+            <div className="flex items-center justify-between gap-2 border-b border-border pb-3">
+              <h3 className="flex items-center gap-2 text-base font-semibold"><Wallet aria-hidden="true" size={18} strokeWidth={1.8} /> By account</h3>
+              <span className="text-xs text-muted-foreground">{accountStats.filter((item) => item.amount > 0).length} active</span>
             </div>
-
-            <div className="space-y-3">
-              {(Object.keys(EXPENSE_SOURCE_ACCOUNTS) as ExpenseSourceAccount[]).map((accKey) => {
-                const accMeta = EXPENSE_SOURCE_ACCOUNTS[accKey];
-                const accStat = accountStats.find((s) => s.id === accKey);
-                const AccIcon = ACCOUNT_ICON_MAP[accMeta.icon] || Wallet;
-                const amt = accStat ? accStat.amount : 0;
-                const pct = accStat ? accStat.percentage : 0;
-
+            <ul className="space-y-3">
+              {accountStats.map((item) => {
+                const Icon = ACCOUNT_ICON_MAP[item.meta.icon] || Wallet;
                 return (
-                  <div
-                    key={accKey}
-                    className={`p-3 rounded-2xl border transition-all ${
-                      amt > 0
-                        ? `${accMeta.badgeBg} ${accMeta.badgeDarkBg} ${accMeta.borderColor} ${accMeta.borderDarkColor}`
-                        : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200/50 dark:border-slate-800 opacity-60'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className={`w-7 h-7 rounded-xl ${accMeta.badgeBg} ${accMeta.textColor} flex items-center justify-center`}>
-                          <AccIcon className="w-3.5 h-3.5" />
-                        </div>
-                        <div>
-                          <div className="text-xs font-bold text-slate-900 dark:text-white">
-                            {accMeta.shortName}
-                          </div>
-                          <div className="text-[10px] text-slate-400">
-                            {accStat ? `${accStat.count} transactions` : 'No spend this month'}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-right font-mono">
-                        <div className="text-xs font-bold text-slate-900 dark:text-white">
-                          {formatUGX(amt)}
-                        </div>
-                        {amt > 0 && (
-                          <div className="text-[10px] text-slate-500 font-bold">
-                            {pct.toFixed(0)}%
-                          </div>
-                        )}
-                      </div>
+                  <li key={item.id}>
+                    <div className="flex items-center justify-between gap-3 text-sm">
+                      <span className="flex min-w-0 items-center gap-2 font-medium"><Icon aria-hidden="true" size={16} strokeWidth={1.8} className="shrink-0 text-muted-foreground" /> <span className="truncate">{item.meta.name}</span></span>
+                      <span className="shrink-0 text-right font-mono-num tabular-nums">{formatUGX(item.amount)}</span>
                     </div>
-                  </div>
+                    <div className="mt-1.5 h-1.5 overflow-hidden rounded-pill bg-muted">
+                      <div className="h-full rounded-pill bg-primary" style={{ width: `${Math.min(100, item.percentage)}%` }} />
+                    </div>
+                    <p className="mt-1 text-xs text-muted-foreground">{item.count} records · {item.percentage.toFixed(0)}%</p>
+                  </li>
                 );
               })}
+            </ul>
+          </article>
+
+          <article className="space-y-3 rounded-surface border border-border bg-card p-4">
+            <div className="flex items-center justify-between gap-2 border-b border-border pb-3">
+              <h3 className="flex items-center gap-2 text-base font-semibold"><Receipt aria-hidden="true" size={18} strokeWidth={1.8} /> By category</h3>
+              <span className="text-xs text-muted-foreground">{categoryStats.length} active</span>
             </div>
-          </div>
-
-          {/* Spend by Category */}
-          <div className="p-6 rounded-[32px] bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm transition-colors space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
-              <div className="flex items-center gap-2.5">
-                <PieChartIcon className="w-4 h-4 text-rose-600 dark:text-rose-400" />
-                <h4 className="text-sm font-bold text-slate-900 dark:text-white">
-                  Spending Categories
-                </h4>
-              </div>
-              <span className="text-xs font-mono font-bold text-slate-400">
-                {categoryStats.length} active
-              </span>
-            </div>
-
-            <div className="space-y-3">
-              {categoryStats.slice(0, 4).map((item) => {
-                const IconComp = CATEGORY_ICON_MAP[item.id] || Receipt;
-                return (
-                  <div key={item.id} className="space-y-1.5">
-                    <div className="flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-2">
-                        <div
-                          className={`w-6 h-6 rounded-lg ${item.meta.bgLight} ${item.meta.bgDark} ${item.meta.textLight} ${item.meta.textDark} flex items-center justify-center`}
-                        >
-                          <IconComp className="w-3 h-3" />
-                        </div>
-                        <span className="font-bold text-slate-800 dark:text-slate-200">
-                          {item.meta.name}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-2 font-mono">
-                        <span className="font-bold text-slate-900 dark:text-white">
-                          {formatUGX(item.amount)}
-                        </span>
-                        <span className="text-[11px] text-slate-400 w-8 text-right">
-                          {item.percentage.toFixed(0)}%
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="w-full h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
-                      <div
-                        className="h-full rounded-full bg-rose-500 transition-all duration-500"
-                        style={{ width: `${Math.min(100, item.percentage)}%` }}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Payment Method Channels */}
-          <div className="p-6 rounded-[32px] bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm transition-colors space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
-              <div className="flex items-center gap-2.5">
-                <Smartphone className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                <h4 className="text-sm font-bold text-slate-900 dark:text-white">Payment Channels</h4>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              {paymentStats.map((pm) => (
-                <div
-                  key={pm.id}
-                  className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between"
-                >
-                  <div className="flex items-center gap-2.5">
-                    <span className={`w-3 h-3 rounded-full ${pm.accentDot}`} />
-                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                      {pm.name}
-                    </span>
-                  </div>
-                  <div className="text-right font-mono">
-                    <div className="text-xs font-bold text-slate-900 dark:text-white">
-                      {formatUGX(pm.amount)}
-                    </div>
-                    <div className="text-[10px] text-slate-400">
-                      {pm.percentage.toFixed(0)}% of total
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Filter & Search Header */}
-      <div className="p-5 rounded-[28px] bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm transition-colors space-y-3.5">
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-          {/* Search Box */}
-          <div className="relative flex-1">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-            <input
-              id="expense-search-input"
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search expenses by note, account, category or amount..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 text-slate-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-rose-500 outline-none transition-colors"
-            />
-          </div>
-
-          {/* Time Filter Tabs */}
-          <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
-            {(
-              [
-                { id: 'month', label: 'This Month' },
-                { id: 'today', label: 'Today' },
-                { id: 'week', label: '7 Days' },
-                { id: 'all', label: 'All Time' },
-              ] as const
-            ).map((t) => (
-              <button
-                key={t.id}
-                onClick={() => setTimeFilter(t.id)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                  timeFilter === t.id
-                    ? 'bg-white dark:bg-slate-900 text-rose-600 dark:text-rose-400 shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
-                }`}
-              >
-                {t.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Export CSV Button */}
-          {expenses.length > 0 && (
-            <button
-              onClick={handleExportCSV}
-              className="px-3.5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs flex items-center gap-1.5 transition-colors shrink-0"
-              title="Download expense history as CSV"
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span>Export CSV</span>
-            </button>
-          )}
-        </div>
-
-        {/* Account Filter Row */}
-        <div className="space-y-1.5 pt-1 border-t border-slate-100 dark:border-slate-800">
-          <div className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-            Filter by Account / Fund
-          </div>
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
-            <button
-              onClick={() => setSelectedAccountFilter('all')}
-              className={`px-3 py-1 rounded-xl text-xs font-bold shrink-0 transition-all ${
-                selectedAccountFilter === 'all'
-                  ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200'
-              }`}
-            >
-              All Accounts
-            </button>
-
-            {(Object.keys(EXPENSE_SOURCE_ACCOUNTS) as ExpenseSourceAccount[]).map((accKey) => {
-              const accMeta = EXPENSE_SOURCE_ACCOUNTS[accKey];
-              const isSelected = selectedAccountFilter === accKey;
-              const AccIcon = ACCOUNT_ICON_MAP[accMeta.icon] || Wallet;
-
-              return (
-                <button
-                  key={accKey}
-                  onClick={() => setSelectedAccountFilter(accKey)}
-                  className={`px-3 py-1 rounded-xl text-xs font-bold shrink-0 flex items-center gap-1.5 transition-all ${
-                    isSelected
-                      ? 'bg-rose-600 text-white shadow-sm'
-                      : `${accMeta.badgeBg} ${accMeta.textColor} hover:opacity-80 border ${accMeta.borderColor}`
-                  }`}
-                >
-                  <AccIcon className="w-3 h-3" />
-                  <span>{accMeta.shortName}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Category Pills Filter */}
-        <div className="space-y-1.5 pt-1 border-t border-slate-100 dark:border-slate-800">
-          <div className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-            Filter by Category
-          </div>
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
-            <button
-              onClick={() => setSelectedCategoryFilter('all')}
-              className={`px-3 py-1 rounded-xl text-xs font-bold shrink-0 transition-all ${
-                selectedCategoryFilter === 'all'
-                  ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200'
-              }`}
-            >
-              All Categories
-            </button>
-
-            {Object.values(EXPENSE_CATEGORIES).map((cat) => {
-              const isSelected = selectedCategoryFilter === cat.id;
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => setSelectedCategoryFilter(cat.id)}
-                  className={`px-3 py-1 rounded-xl text-xs font-bold shrink-0 transition-all ${
-                    isSelected
-                      ? 'bg-rose-600 text-white shadow-sm'
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200'
-                  }`}
-                >
-                  {cat.name}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* Expense Ledger Feed */}
-      <div className="space-y-4">
-        {groupedExpenses.length === 0 ? (
-          <div className="p-12 text-center rounded-[32px] bg-white dark:bg-slate-900 border border-dashed border-slate-300 dark:border-slate-800 space-y-4">
-            <div className="w-14 h-14 mx-auto rounded-2xl bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 flex items-center justify-center">
-              <Receipt className="w-7 h-7" />
-            </div>
-            <div className="max-w-sm mx-auto space-y-1.5">
-              <h4 className="text-base font-bold text-slate-900 dark:text-white">
-                {searchQuery || selectedCategoryFilter !== 'all' || selectedAccountFilter !== 'all'
-                  ? 'No matching expenses found'
-                  : 'No expenses recorded yet'}
-              </h4>
-              <p className="text-xs text-slate-400 dark:text-slate-500">
-                {searchQuery || selectedCategoryFilter !== 'all' || selectedAccountFilter !== 'all'
-                  ? 'Try clearing your search query or filters to see more entries.'
-                  : 'Start tracking your daily expenses and which accounts (Home Rent, Wifi, Work Rent, or Pocket) they are deducted from.'}
-              </p>
-            </div>
-            <button
-              onClick={() => onOpenAddExpense()}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-rose-600/20 active:scale-95 transition-all"
-            >
-              <Plus className="w-4 h-4 stroke-[3]" />
-              <span>Record First Expense</span>
-            </button>
-          </div>
-        ) : (
-          groupedExpenses.map((group) => (
-            <div key={group.date} className="space-y-2">
-              {/* Date Header */}
-              <div className="flex items-center justify-between px-3 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                <span>
-                  {group.date === todayStr
-                    ? 'Today'
-                    : new Date(group.date).toLocaleDateString('en-US', {
-                        weekday: 'short',
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric',
-                      })}
-                </span>
-                <span className="font-mono text-slate-700 dark:text-slate-300">
-                  Total: {formatUGX(group.totalForDay)}
-                </span>
-              </div>
-
-              {/* Transactions in Date */}
-              <div className="bg-white dark:bg-slate-900 rounded-[28px] border border-slate-200/80 dark:border-slate-800 shadow-sm divide-y divide-slate-100 dark:divide-slate-800/80 overflow-hidden transition-colors">
-                {group.items.map((item) => {
-                  const catMeta = EXPENSE_CATEGORIES[item.category] || EXPENSE_CATEGORIES.other;
-                  const IconComp = CATEGORY_ICON_MAP[item.category] || Receipt;
-                  const pm = PAYMENT_METHODS.find((p) => p.id === item.paymentMethod) || PAYMENT_METHODS[0];
-                  const accMeta = EXPENSE_SOURCE_ACCOUNTS[item.sourceAccount || 'general_wallet'];
-                  const AccIcon = ACCOUNT_ICON_MAP[accMeta.icon] || Wallet;
-
+            {categoryStats.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No spending categories yet.</p>
+            ) : (
+              <ul className="space-y-3">
+                {categoryStats.slice(0, 5).map((item) => {
+                  const Icon = CATEGORY_ICON_MAP[item.id] || Receipt;
                   return (
-                    <div
-                      key={item.id}
-                      className="p-4 sm:p-5 flex items-center justify-between gap-3 hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors group"
-                    >
-                      {/* Left info */}
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div
-                          className={`w-10 h-10 rounded-2xl ${catMeta.bgLight} ${catMeta.bgDark} ${catMeta.textLight} ${catMeta.textDark} flex items-center justify-center shrink-0 shadow-inner`}
-                        >
-                          <IconComp className="w-5 h-5" />
-                        </div>
-
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-sm font-bold text-slate-900 dark:text-white truncate">
-                              {catMeta.name}
-                            </span>
-
-                            {/* Account Badge */}
-                            <span
-                              className={`text-[10px] px-2 py-0.5 rounded-md font-bold flex items-center gap-1 ${accMeta.badgeBg} ${accMeta.badgeDarkBg} ${accMeta.textColor} ${accMeta.textDarkColor} border ${accMeta.borderColor} ${accMeta.borderDarkColor}`}
-                            >
-                              <AccIcon className="w-2.5 h-2.5" />
-                              <span>{accMeta.shortName}</span>
-                            </span>
-
-                            {/* Payment Channel Badge */}
-                            <span
-                              className={`text-[10px] px-2 py-0.5 rounded-md font-bold ${pm.badgeBg} ${pm.textColor} border ${pm.borderColor}`}
-                            >
-                              {pm.shortName}
-                            </span>
-
-                            {/* Vault deduction tag */}
-                            {item.deductFromVault && (
-                              <span className="text-[9px] px-1.5 py-0.5 rounded font-mono font-bold bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-900">
-                                Vault Deducted
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">
-                            {item.note || 'No description'}
-                          </p>
-                        </div>
+                    <li key={item.id}>
+                      <div className="flex items-center justify-between gap-3 text-sm">
+                        <span className="flex min-w-0 items-center gap-2 font-medium"><Icon aria-hidden="true" size={16} strokeWidth={1.8} className="shrink-0 text-muted-foreground" /> <span className="truncate">{item.meta.name}</span></span>
+                        <span className="shrink-0 text-right font-mono-num tabular-nums">{formatUGX(item.amount)}</span>
                       </div>
-
-                      {/* Right amount & actions */}
-                      <div className="flex items-center gap-3 shrink-0">
-                        <div className="text-right">
-                          <div className="text-sm sm:text-base font-black font-mono-num text-rose-600 dark:text-rose-400">
-                            -{formatUGX(item.amount)}
-                          </div>
-                          <div className="text-[10px] text-slate-400 font-mono">
-                            {new Date(item.createdAt).toLocaleTimeString([], {
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })}
-                          </div>
-                        </div>
-
-                        {/* Edit & Delete Action Buttons */}
-                        <div className="flex items-center gap-1 opacity-90 sm:opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button
-                            onClick={() => onOpenEditExpense(item)}
-                            className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors"
-                            title="Edit expense"
-                          >
-                            <Edit2 className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            onClick={() => onDeleteExpense(item.id)}
-                            className="p-2 rounded-xl bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 text-rose-600 dark:text-rose-400 transition-colors"
-                            title="Delete expense"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
+                      <div className="mt-1.5 h-1.5 overflow-hidden rounded-pill bg-muted">
+                        <div className="h-full rounded-pill bg-primary transition-[width] duration-200" style={{ width: `${Math.min(100, item.percentage)}%` }} />
                       </div>
-                    </div>
+                      <p className="mt-1 text-xs text-muted-foreground">{item.percentage.toFixed(0)}% of total</p>
+                    </li>
                   );
                 })}
-              </div>
+              </ul>
+            )}
+          </article>
+
+          <article className="space-y-3 rounded-surface border border-border bg-card p-4">
+            <div className="flex items-center justify-between gap-2 border-b border-border pb-3">
+              <h3 className="flex items-center gap-2 text-base font-semibold"><Smartphone aria-hidden="true" size={18} strokeWidth={1.8} /> By payment method</h3>
             </div>
-          ))
-        )}
-      </div>
+            {paymentStats.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No payment methods used this month.</p>
+            ) : (
+              <ul className="space-y-3">
+                {paymentStats.map((method) => (
+                  <li key={method.id} className="flex items-center justify-between gap-3 border-b border-border py-2 last:border-0">
+                    <div>
+                      <p className="text-sm font-medium">{method.name}</p>
+                      <p className="mt-0.5 text-xs text-muted-foreground">{method.percentage.toFixed(0)}% of total</p>
+                    </div>
+                    <span className="text-right font-mono-num tabular-nums text-sm">{formatUGX(method.amount)}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </article>
+        </section>
+      )}
+
+      <section aria-label="Search and filter expenses" className="space-y-4 rounded-surface border border-border bg-card p-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="space-y-1.5 sm:col-span-2">
+            <label htmlFor="expense-search-input" className="text-sm font-medium">Search expenses</label>
+            <div className="relative">
+              <Search aria-hidden="true" size={16} strokeWidth={1.8} className="pointer-events-none absolute left-3 top-1/2 -tranzinc-y-1/2 text-muted-foreground" />
+              <input
+                id="expense-search-input"
+                type="search"
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder="Search note, account, category, amount, or payment method"
+                className="min-h-11 w-full rounded-surface border border-input bg-background pl-10 pr-3 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              />
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <label htmlFor="expense-time-filter" className="text-sm font-medium">Date range</label>
+            <select id="expense-time-filter" value={timeFilter} onChange={(event) => setTimeFilter(event.target.value as TimeFilter)} className="min-h-11 w-full rounded-surface border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              <option value="month">This month</option>
+              <option value="today">Today</option>
+              <option value="week">Last 7 days</option>
+              <option value="all">All time</option>
+            </select>
+          </div>
+          <div className="space-y-1.5">
+            <label htmlFor="expense-account-filter" className="text-sm font-medium">Account</label>
+            <select id="expense-account-filter" value={selectedAccountFilter} onChange={(event) => setSelectedAccountFilter(event.target.value as ExpenseSourceAccount | 'all')} className="min-h-11 w-full rounded-surface border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              <option value="all">All accounts</option>
+              {(Object.keys(EXPENSE_SOURCE_ACCOUNTS) as ExpenseSourceAccount[]).map((id) => <option key={id} value={id}>{EXPENSE_SOURCE_ACCOUNTS[id].name}</option>)}
+            </select>
+          </div>
+          <div className="space-y-1.5">
+            <label htmlFor="expense-category-filter" className="text-sm font-medium">Category</label>
+            <select id="expense-category-filter" value={selectedCategoryFilter} onChange={(event) => setSelectedCategoryFilter(event.target.value as ExpenseCategoryId | 'all')} className="min-h-11 w-full rounded-surface border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              <option value="all">All categories</option>
+              {Object.values(EXPENSE_CATEGORIES).map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
+            </select>
+          </div>
+          <div className="space-y-1.5">
+            <label htmlFor="expense-payment-filter" className="text-sm font-medium">Payment method</label>
+            <select id="expense-payment-filter" value={selectedPaymentFilter} onChange={(event) => setSelectedPaymentFilter(event.target.value as PaymentMethod | 'all')} className="min-h-11 w-full rounded-surface border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              <option value="all">All payment methods</option>
+              {PAYMENT_METHODS.map((method) => <option key={method.id} value={method.id}>{method.name}</option>)}
+            </select>
+          </div>
+        </div>
+        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border pt-3">
+          <p className="text-sm text-muted-foreground">
+            <span className="font-mono-num tabular-nums">{filteredExpenses.length}</span> results ·{' '}
+            <span className="font-mono-num tabular-nums font-semibold text-foreground">{formatUGX(filteredTotal)}</span>
+          </p>
+          <div className="flex items-center gap-2">
+            {hasActiveFilters && <button type="button" onClick={clearFilters} className="min-h-11 rounded-surface px-3 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Clear filters</button>}
+            <button type="button" onClick={handleExportCSV} disabled={expenses.length === 0} className="inline-flex min-h-11 items-center gap-2 rounded-surface border border-border px-3 text-sm font-medium hover:bg-muted disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" title="Download all expenses as CSV">
+              <Download aria-hidden="true" size={16} strokeWidth={1.8} /> Export CSV
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {groupedExpenses.length === 0 ? (
+        <section className="rounded-surface border border-dashed border-border bg-card p-6" aria-live="polite">
+          <div className="flex items-start gap-3">
+            <Receipt aria-hidden="true" size={20} strokeWidth={1.8} className="mt-0.5 text-muted-foreground" />
+            <div>
+              <h3 className="text-base font-semibold">{hasActiveFilters ? 'No matching expenses' : 'No expenses recorded yet'}</h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {hasActiveFilters ? 'Clear the filters to see more records.' : 'Record a payment to start organizing your spending.'}
+              </p>
+              {hasActiveFilters ? (
+                <button type="button" onClick={clearFilters} className="mt-3 min-h-11 rounded-surface border border-border px-3 text-sm font-medium hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Clear filters</button>
+              ) : (
+                <button type="button" onClick={() => onOpenAddExpense()} className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-surface bg-primary px-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                  <Plus aria-hidden="true" size={16} strokeWidth={1.8} /> Record expense
+                </button>
+              )}
+            </div>
+          </div>
+        </section>
+      ) : (
+        <div className="space-y-4">
+          {groupedExpenses.map((group) => (
+            <section key={group.date} aria-label={`Expenses for ${group.date}`} className="overflow-hidden rounded-surface border border-border bg-card">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border bg-muted/40 px-4 py-3">
+                <h3 className="text-sm font-semibold">
+                  {group.date === todayStr ? 'Today' : new Date(group.date).toLocaleDateString('en', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+                </h3>
+                <span className="font-mono-num tabular-nums text-sm font-medium">{formatUGX(group.totalForDay)}</span>
+              </div>
+              <ul className="divide-y divide-border">
+                {group.items.map((item) => {
+                  const category = EXPENSE_CATEGORIES[item.category] || EXPENSE_CATEGORIES.other;
+                  const Icon = CATEGORY_ICON_MAP[item.category] || Receipt;
+                  const accountId = item.sourceAccount || 'general_wallet';
+                  const account = EXPENSE_SOURCE_ACCOUNTS[accountId];
+                  const AccountIcon = ACCOUNT_ICON_MAP[account.icon] || Wallet;
+                  const payment = PAYMENT_METHODS.find((method) => method.id === item.paymentMethod) || PAYMENT_METHODS[0];
+                  return (
+                    <li key={item.id} className="flex flex-wrap items-center justify-between gap-3 p-4 transition-colors hover:bg-muted/40">
+                      <div className="flex min-w-0 flex-1 items-start gap-3">
+                        <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-surface bg-muted text-foreground">
+                          <Icon aria-hidden="true" size={18} strokeWidth={1.8} />
+                        </span>
+                        <div className="min-w-0">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h4 className="text-sm font-semibold">{category.name}</h4>
+                            <span className="inline-flex min-h-6 items-center gap-1 rounded-pill bg-muted px-2 text-xs text-foreground">
+                              <AccountIcon aria-hidden="true" size={12} strokeWidth={1.8} /> {account.shortName}
+                            </span>
+                            <span className="inline-flex min-h-6 items-center rounded-pill border border-border px-2 text-xs text-muted-foreground">{payment.shortName}</span>
+                            {item.deductFromVault && <span className="inline-flex min-h-6 items-center rounded-pill bg-warning/10 px-2 text-xs font-medium text-warning">Vault deducted</span>}
+                          </div>
+                          <p className="mt-1 break-words text-sm text-muted-foreground">{item.note || 'No description'}</p>
+                        </div>
+                      </div>
+                      <div className="flex w-full items-center justify-between gap-2 sm:w-auto sm:justify-end">
+                        <div className="sm:text-right">
+                          <p className="font-mono-num tabular-nums text-base font-semibold text-destructive">−{formatUGX(item.amount)}</p>
+                          <p className="mt-0.5 text-xs text-muted-foreground">{new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <button type="button" onClick={() => onOpenEditExpense(item)} aria-label="Edit expense" title="Edit expense" className="inline-flex size-11 items-center justify-center rounded-surface text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                            <Edit2 aria-hidden="true" size={16} strokeWidth={1.8} />
+                          </button>
+                          <button type="button" onClick={() => onDeleteExpense(item.id)} aria-label="Delete expense" title="Delete expense" className="inline-flex size-11 items-center justify-center rounded-surface text-muted-foreground hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                            <Trash2 aria-hidden="true" size={16} strokeWidth={1.8} />
+                          </button>
+                        </div>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

@@ -116,7 +116,7 @@ export const EditEntryModal: React.FC<EditEntryModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-900/60 dark:bg-black/70 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in duration-150"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-zinc-900/60 dark:bg-black/70 p-0 sm:p-4 animate-in fade-in duration-150"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -128,17 +128,17 @@ export const EditEntryModal: React.FC<EditEntryModalProps> = ({
         id="edit-entry-modal"
         onMouseDown={(e) => e.stopPropagation()}
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-t-[32px] sm:rounded-[36px] shadow-2xl border border-slate-100 dark:border-slate-800 flex flex-col max-h-[92vh] overflow-hidden"
+        className="w-full max-w-lg bg-white dark:bg-zinc-900 rounded-surface shadow-floating border border-zinc-100 dark:border-zinc-800 flex flex-col max-h-[92vh] overflow-hidden"
       >
         {/* Header - Always visible at top */}
-        <div className="flex items-center justify-between p-6 pb-4 border-b border-slate-100 dark:border-slate-800 shrink-0 bg-white dark:bg-slate-900">
+        <div className="flex items-center justify-between p-6 pb-4 border-b border-zinc-100 dark:border-zinc-800 shrink-0 bg-white dark:bg-zinc-900">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-surface bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center">
               <Edit3 className="w-5 h-5 stroke-[2.5] pointer-events-none" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">Edit Deposit Record</h3>
-              <p className="text-xs text-slate-400 dark:text-slate-500">Correct money amount, category, or note</p>
+              <h3 className="text-base font-bold text-zinc-900 dark:text-white">Edit Deposit Record</h3>
+              <p className="text-xs text-zinc-400 dark:text-zinc-500">Correct money amount, category, or note</p>
             </div>
           </div>
 
@@ -151,7 +151,7 @@ export const EditEntryModal: React.FC<EditEntryModalProps> = ({
               onClose();
             }}
             aria-label="Close modal"
-            className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors cursor-pointer active:scale-95"
+            className="p-2 rounded-surface bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors cursor-pointer active:scale-95"
           >
             <X className="w-4 h-4 pointer-events-none" />
           </button>
@@ -162,12 +162,12 @@ export const EditEntryModal: React.FC<EditEntryModalProps> = ({
 
         {/* Delete confirmation banner */}
         {showDeleteConfirm ? (
-          <div className="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 space-y-3">
+          <div className="p-4 rounded-surface bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 space-y-3">
             <div className="flex items-center gap-2.5 text-rose-700 dark:text-rose-400 font-bold text-xs">
               <AlertTriangle className="w-4 h-4 shrink-0" />
               <span>Are you sure you want to remove this deposit of {formatUGX(entry.amount)}?</span>
             </div>
-            <p className="text-[11px] text-rose-600 dark:text-rose-400/80">
+            <p className="text-xs text-rose-600 dark:text-rose-400/80">
               This amount will be deducted from {categories[entry.categoryId]?.name || 'the goal'}.
             </p>
             <div className="flex items-center gap-2 pt-1">
@@ -175,7 +175,7 @@ export const EditEntryModal: React.FC<EditEntryModalProps> = ({
                 type="button"
                 onClick={handleDelete}
                 disabled={isSubmitting}
-                className="flex-1 py-2.5 px-3 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all"
+                className="flex-1 py-2.5 px-3 rounded-surface bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs flex items-center justify-center gap-1.5  transition-all"
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 <span>{isSubmitting ? 'Deleting...' : 'Yes, Delete Record'}</span>
@@ -183,7 +183,7 @@ export const EditEntryModal: React.FC<EditEntryModalProps> = ({
               <button
                 type="button"
                 onClick={() => setShowDeleteConfirm(false)}
-                className="py-2.5 px-4 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs"
+                className="py-2.5 px-4 rounded-surface bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-bold text-xs"
               >
                 Cancel
               </button>
@@ -194,7 +194,7 @@ export const EditEntryModal: React.FC<EditEntryModalProps> = ({
         <div className="space-y-4">
           {/* Category Selector */}
           <div>
-            <label className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 block mb-2">
+            <label className="text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 block mb-2">
               Goal Category
             </label>
             <div className="grid grid-cols-3 gap-2.5">
@@ -214,10 +214,10 @@ export const EditEntryModal: React.FC<EditEntryModalProps> = ({
                     type="button"
                     id={`edit-select-${item.id}`}
                     onClick={() => setSelectedCategory(item.id)}
-                    className={`p-3 rounded-2xl border text-left flex flex-col justify-between transition-all ${
+                    className={`p-3 rounded-surface border text-left flex flex-col justify-between transition-all ${
                       isSelected
-                        ? `${item.borderCol} ring-2 ring-indigo-500/20 shadow-sm`
-                        : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+                        ? `${item.borderCol} ring-2 ring-indigo-500/20 `
+                        : 'bg-zinc-50 dark:bg-zinc-800/60 border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600'
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -225,8 +225,8 @@ export const EditEntryModal: React.FC<EditEntryModalProps> = ({
                       {isSelected && <Check className="w-4 h-4 text-indigo-600 dark:text-indigo-400 stroke-[3]" />}
                     </div>
                     <div className="mt-2">
-                      <div className="text-xs font-bold text-slate-900 dark:text-white">{item.label}</div>
-                      <div className="text-[10px] text-slate-400 dark:text-slate-500 font-mono-num font-semibold">
+                      <div className="text-xs font-bold text-zinc-900 dark:text-white">{item.label}</div>
+                      <div className="text-xs text-zinc-400 dark:text-zinc-500 font-mono-num font-semibold">
                         {formatUGXShort(categories[item.id]?.targetAmount || 0)}
                       </div>
                     </div>
@@ -239,16 +239,16 @@ export const EditEntryModal: React.FC<EditEntryModalProps> = ({
           {/* Amount Input */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-xs">
-              <label className="font-bold text-slate-700 dark:text-slate-300">Amount Saved (UGX)</label>
+              <label className="font-bold text-zinc-700 dark:text-zinc-300">Amount Saved (UGX)</label>
               {entry.amount !== numAmount && (
-                <span className="text-[11px] font-bold font-mono-num text-indigo-600 dark:text-indigo-400">
+                <span className="text-xs font-bold font-mono-num text-indigo-600 dark:text-indigo-400">
                   {amountDifference > 0 ? `+${formatUGX(amountDifference)}` : `${formatUGX(amountDifference)}`}
                 </span>
               )}
             </div>
 
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 uppercase tracking-wider font-mono">
+              <span className="absolute left-4 top-1/2 -tranzinc-y-1/2 text-xs font-bold text-zinc-400 uppercase tracking-wider font-mono">
                 UGX
               </span>
               <input
@@ -258,7 +258,7 @@ export const EditEntryModal: React.FC<EditEntryModalProps> = ({
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 placeholder="0"
-                className="w-full pl-14 pr-4 py-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-indigo-500 dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-900 text-xl font-black font-mono-num text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-950"
+                className="w-full pl-14 pr-4 py-3.5 rounded-surface bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 focus:border-indigo-500 dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-zinc-900 text-xl font-black font-mono-num text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-950"
                 required
               />
             </div>
@@ -266,7 +266,7 @@ export const EditEntryModal: React.FC<EditEntryModalProps> = ({
 
           {/* Quick preset chips */}
           <div>
-            <div className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5">
+            <div className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-1.5">
               Adjust amount quickly
             </div>
             <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 scroll-smooth -mx-1 px-1">
@@ -275,7 +275,7 @@ export const EditEntryModal: React.FC<EditEntryModalProps> = ({
                   key={amt}
                   type="button"
                   onClick={() => handleQuickChip(amt)}
-                  className="py-2 px-3 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-xs font-bold text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 font-mono-num transition-colors shrink-0 whitespace-nowrap active:scale-95"
+                  className="py-2 px-3 rounded-surface bg-zinc-50 dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-xs font-bold text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 font-mono-num transition-colors shrink-0 whitespace-nowrap active:scale-95"
                 >
                   +{formatUGX(amt)}
                 </button>
@@ -286,21 +286,21 @@ export const EditEntryModal: React.FC<EditEntryModalProps> = ({
           {/* Date & Note */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-600 dark:text-slate-400 flex items-center gap-1">
-                <Calendar className="w-3.5 h-3.5 text-slate-400" />
+              <label className="text-xs font-bold text-zinc-600 dark:text-zinc-400 flex items-center gap-1">
+                <Calendar className="w-3.5 h-3.5 text-zinc-400" />
                 <span>Date</span>
               </label>
               <input
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-800 dark:text-slate-200 font-mono-num focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-950"
+                className="w-full px-3 py-2.5 rounded-surface bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs text-zinc-800 dark:text-zinc-200 font-mono-num focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-950"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-600 dark:text-slate-400 flex items-center gap-1">
-                <Tag className="w-3.5 h-3.5 text-slate-400" />
+              <label className="text-xs font-bold text-zinc-600 dark:text-zinc-400 flex items-center gap-1">
+                <Tag className="w-3.5 h-3.5 text-zinc-400" />
                 <span>Note / Memo</span>
               </label>
               <input
@@ -308,7 +308,7 @@ export const EditEntryModal: React.FC<EditEntryModalProps> = ({
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 placeholder="e.g. Daily change, client cash"
-                className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-800 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-950"
+                className="w-full px-3 py-2.5 rounded-surface bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-950"
               />
             </div>
           </div>
@@ -320,7 +320,7 @@ export const EditEntryModal: React.FC<EditEntryModalProps> = ({
                 key={preset}
                 type="button"
                 onClick={() => setNote(preset)}
-                className="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition-colors"
+                className="text-xs font-semibold px-2.5 py-1 rounded-surface bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 transition-colors"
               >
                 {preset}
               </button>
@@ -328,18 +328,18 @@ export const EditEntryModal: React.FC<EditEntryModalProps> = ({
           </div>
 
           {/* Impact Comparison Preview */}
-          <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 text-xs space-y-1">
-            <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
+          <div className="p-3.5 rounded-surface bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/80 text-xs space-y-1">
+            <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
               <span>Original record:</span>
-              <span className="font-mono-num font-semibold text-slate-700 dark:text-slate-300">
+              <span className="font-mono-num font-semibold text-zinc-700 dark:text-zinc-300">
                 {categories[entry.categoryId]?.name} • {formatUGX(entry.amount)} ({entry.date})
               </span>
             </div>
-            <div className="flex items-center justify-between pt-1 border-t border-slate-200/70 dark:border-slate-700/70 font-bold">
-              <span className="text-slate-700 dark:text-slate-300">Updated to:</span>
+            <div className="flex items-center justify-between pt-1 border-t border-zinc-200/70 dark:border-zinc-700/70 font-bold">
+              <span className="text-zinc-700 dark:text-zinc-300">Updated to:</span>
               <span className="font-mono-num text-indigo-600 dark:text-indigo-400 flex items-center gap-1">
                 <span>{currentCategory.name}</span>
-                <ArrowRight className="w-3 h-3 text-slate-400" />
+                <ArrowRight className="w-3 h-3 text-zinc-400" />
                 <span>{formatUGX(numAmount)}</span>
               </span>
             </div>
@@ -349,12 +349,12 @@ export const EditEntryModal: React.FC<EditEntryModalProps> = ({
           </div>
 
           {/* Sticky Footer: Action Buttons */}
-          <div className="p-4 sm:px-6 sm:py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/90 dark:bg-slate-900/90 backdrop-blur-sm shrink-0 flex items-center gap-3">
+          <div className="p-4 sm:px-6 sm:py-4 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50/90 dark:bg-zinc-900/90 shrink-0 flex items-center gap-3">
             {!showDeleteConfirm && (
               <button
                 type="button"
                 onClick={() => setShowDeleteConfirm(true)}
-                className="p-3.5 rounded-2xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-400 transition-colors cursor-pointer"
+                className="p-3.5 rounded-surface bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-400 transition-colors cursor-pointer"
                 title="Delete this record"
               >
                 <Trash2 className="w-4 h-4 pointer-events-none" />
@@ -369,7 +369,7 @@ export const EditEntryModal: React.FC<EditEntryModalProps> = ({
                 e.stopPropagation();
                 onClose();
               }}
-              className="px-4 py-3.5 rounded-2xl bg-slate-200/80 hover:bg-slate-300/80 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer active:scale-95"
+              className="px-4 py-3.5 rounded-surface bg-zinc-200/80 hover:bg-zinc-300/80 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer active:scale-95"
             >
               Cancel
             </button>
@@ -378,7 +378,7 @@ export const EditEntryModal: React.FC<EditEntryModalProps> = ({
               id="save-edited-entry-btn"
               type="submit"
               disabled={isSubmitting || numAmount <= 0}
-              className="flex-1 py-3.5 px-4 rounded-2xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-lg shadow-indigo-600/20 active:scale-95 cursor-pointer"
+              className="flex-1 py-3.5 px-4 rounded-surface bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all  active:scale-95 cursor-pointer"
             >
               <Check className="w-4 h-4 stroke-[3] pointer-events-none" />
               <span>{isSubmitting ? 'Saving Changes...' : 'Save Changes'}</span>

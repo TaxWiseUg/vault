@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import {
   Landmark,
   Calendar,
@@ -19,7 +19,7 @@ import {
   ChevronRight,
   ChevronDown,
   ChevronUp,
-  Sparkles,
+  Target,
   RefreshCw,
   Copy,
   Info,
@@ -27,7 +27,6 @@ import {
   BarChart3,
   Layers,
   CalendarDays,
-  Target,
   ArrowRight,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
@@ -39,7 +38,7 @@ import {
   CategoryId,
   CategoryGoal,
 } from '../types';
-import { formatUGX, formatUGXShort, PAYMENT_METHODS, EXPENSE_SOURCE_ACCOUNTS, QUICK_DEBT_PAY_AMOUNTS } from '../lib/constants';
+import { formatUGX, PAYMENT_METHODS, EXPENSE_SOURCE_ACCOUNTS, QUICK_DEBT_PAY_AMOUNTS } from '../lib/constants';
 
 interface OfficeDebtViewProps {
   debt: DebtGoal;
@@ -93,6 +92,7 @@ export const OfficeDebtView: React.FC<OfficeDebtViewProps> = ({
 
   // Collapsible groups state for transaction history
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
+  const reduceMotion = useReducedMotion();
 
   // Calculation metrics
   const totalDebt = debt.totalDebt || 720000;
@@ -255,7 +255,7 @@ export const OfficeDebtView: React.FC<OfficeDebtViewProps> = ({
         years: 0,
         months: 0,
         days: 0,
-        displayBadge: 'Debt Free! 🎉',
+        displayBadge: 'Debt Free! ',
         breakdownText: '0 days — debt fully cleared',
         finishDate: 'Completed',
       };
@@ -448,8 +448,8 @@ export const OfficeDebtView: React.FC<OfficeDebtViewProps> = ({
         createdAt: Date.now(),
       });
 
-      // Confetti if fully cleared or completed daily quota
-      if (totalPaid + parsedAmount >= totalDebt || (!isTodayCompleted && todayPaidSum + parsedAmount >= dailyMin)) {
+      // Celebrate a debt payoff once, while respecting the user's motion preference.
+      if (!reduceMotion && remaining > 0 && parsedAmount >= remaining) {
         confetti({
           particleCount: 80,
           spread: 70,
@@ -511,7 +511,7 @@ export const OfficeDebtView: React.FC<OfficeDebtViewProps> = ({
 
   // Copy Summary statement
   const handleCopySummary = () => {
-    const summary = `🏢 Office Debt Repayment Summary
+    const summary = `Office Debt Repayment Summary
 Principal: ${formatUGX(totalDebt)}
 Total Paid: ${formatUGX(totalPaid)} (${progressPct}%)
 Remaining Balance: ${formatUGX(remaining)}
@@ -539,10 +539,10 @@ Logs Recorded: ${payments.length} installments`;
               Office Debt Payoff Commitment
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight mt-0.5">
+          <h1 className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white tracking-tight mt-0.5">
             Office Debt (720k)
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
             Mandatory daily installments of at least <strong className="text-amber-600 dark:text-amber-400">{formatUGX(dailyMin)}/day</strong> until fully cleared.
           </p>
         </div>
@@ -551,10 +551,10 @@ Logs Recorded: ${payments.length} installments`;
           <button
             id="debt-copy-summary-btn"
             onClick={handleCopySummary}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-surface text-xs font-bold bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors "
             title="Copy payoff report to clipboard"
           >
-            {copiedText ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
+            {copiedText ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5 text-zinc-400" />}
             <span>{copiedText ? 'Copied' : 'Share Report'}</span>
           </button>
 
@@ -566,29 +566,29 @@ Logs Recorded: ${payments.length} installments`;
               setConfigCreditor(debt.creditorName || '');
               setIsConfigOpen(true);
             }}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-surface text-xs font-bold bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors "
           >
-            <Sliders className="w-3.5 h-3.5 text-slate-400" />
+            <Sliders className="w-3.5 h-3.5 text-zinc-400" />
             <span>Target Config</span>
           </button>
         </div>
       </div>
 
       {/* Main Metric Hero Card */}
-      <div className="bg-white dark:bg-slate-900 rounded-[32px] sm:rounded-[40px] p-6 sm:p-8 shadow-sm border border-amber-200/70 dark:border-amber-900/40 relative overflow-hidden transition-colors">
+      <div className="bg-white dark:bg-zinc-900 rounded-surface sm:rounded-surface p-6 sm:p-8  border border-amber-200/70 dark:border-amber-900/40 relative overflow-hidden transition-colors">
         {/* Subtle decorative background glow */}
         <div className="absolute -right-16 -top-16 w-56 h-56 rounded-full bg-amber-500/10 dark:bg-amber-500/5 blur-3xl pointer-events-none" />
 
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-6 border-b border-slate-100 dark:border-slate-800">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-6 border-b border-zinc-100 dark:border-zinc-800">
           <div className="space-y-1">
-            <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
+            <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">
               Remaining Debt Balance
             </span>
             <div className="flex items-baseline gap-3 flex-wrap">
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 dark:text-white font-mono-num tracking-tight">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-zinc-900 dark:text-white font-mono-num tracking-tight">
                 {formatUGX(remaining)}
               </h2>
-              <span className="text-sm font-semibold text-slate-400 dark:text-slate-500">
+              <span className="text-sm font-semibold text-zinc-400 dark:text-zinc-500">
                 of {formatUGX(totalDebt)} original debt
               </span>
             </div>
@@ -596,16 +596,16 @@ Logs Recorded: ${payments.length} installments`;
 
           <div className="flex items-center gap-3">
             <div className="text-right">
-              <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
+              <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">
                 Total Paid Off
               </span>
               <span className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono-num">
                 {formatUGX(totalPaid)}
               </span>
             </div>
-            <div className="w-14 h-14 rounded-2xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-900/60 text-amber-600 dark:text-amber-400 flex flex-col items-center justify-center font-mono-num font-black text-sm shrink-0">
+            <div className="w-14 h-14 rounded-surface bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-900/60 text-amber-600 dark:text-amber-400 flex flex-col items-center justify-center font-mono-num font-black text-sm shrink-0">
               <span>{progressPct}%</span>
-              <span className="text-[9px] font-bold uppercase tracking-tighter opacity-70">Paid</span>
+              <span className="text-xs font-bold uppercase tracking-tighter opacity-70">Paid</span>
             </div>
           </div>
         </div>
@@ -613,28 +613,28 @@ Logs Recorded: ${payments.length} installments`;
         {/* Progress bar */}
         <div className="mt-6 space-y-2">
           <div className="flex justify-between items-center text-xs font-bold">
-            <span className="text-slate-500 dark:text-slate-400">Payoff Completion</span>
+            <span className="text-zinc-500 dark:text-zinc-400">Payoff Completion</span>
             <span className="font-mono-num text-amber-700 dark:text-amber-400">
               {formatUGX(totalPaid)} / {formatUGX(totalDebt)}
             </span>
           </div>
-          <div className="w-full bg-slate-100 dark:bg-slate-800 h-4 rounded-full overflow-hidden p-0.5 border border-slate-200/60 dark:border-slate-700/60">
+          <div className="w-full bg-zinc-100 dark:bg-zinc-800 h-4 rounded-full overflow-hidden p-0.5 border border-zinc-200/60 dark:border-zinc-700/60">
             <div
-              className="bg-gradient-to-r from-amber-500 to-emerald-500 h-full rounded-full transition-all duration-500 shadow-sm"
+              className="bg-primary h-full rounded-full transition-all duration-500 "
               style={{ width: `${Math.max(3, progressPct)}%` }}
             />
           </div>
         </div>
 
         {/* Status Highlights Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6 pt-4 border-t border-zinc-100 dark:border-zinc-800">
           {/* Today's Quota Badge */}
-          <div className={`p-3.5 rounded-2xl border transition-colors flex items-center gap-3 ${
+          <div className={`p-3.5 rounded-surface border transition-colors flex items-center gap-3 ${
             isTodayCompleted
               ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-900/60 text-emerald-900 dark:text-emerald-200'
               : 'bg-amber-50/80 dark:bg-amber-950/30 border-amber-200 dark:border-amber-900/50 text-amber-900 dark:text-amber-200'
           }`}>
-            <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+            <div className={`w-9 h-9 rounded-surface flex items-center justify-center shrink-0 ${
               isTodayCompleted
                 ? 'bg-emerald-600 text-white'
                 : 'bg-amber-500 text-white'
@@ -642,7 +642,7 @@ Logs Recorded: ${payments.length} installments`;
               {isTodayCompleted ? <CheckCircle2 className="w-5 h-5" /> : <Calendar className="w-5 h-5" />}
             </div>
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider block opacity-75">
+              <span className="text-xs font-bold uppercase tracking-wider block opacity-75">
                 Today's Daily Minimum
               </span>
               <div className="text-xs font-black">
@@ -660,31 +660,31 @@ Logs Recorded: ${payments.length} installments`;
           </div>
 
           {/* Daily Streak */}
-          <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-800 flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-orange-500 text-white flex items-center justify-center shrink-0 shadow-sm shadow-orange-500/30">
+          <div className="p-3.5 rounded-surface bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/60 dark:border-zinc-800 flex items-center gap-3">
+            <div className="w-9 h-9 rounded-surface bg-orange-500 text-white flex items-center justify-center shrink-0 ">
               <Flame className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
+              <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">
                 Daily Payoff Streak
               </span>
-              <span className="text-xs font-black text-slate-800 dark:text-slate-100 font-mono-num">
+              <span className="text-xs font-black text-zinc-800 dark:text-zinc-100 font-mono-num">
                 {streakDays} {streakDays === 1 ? 'day' : 'consecutive days'} (≥2k/day)
               </span>
             </div>
           </div>
 
           {/* Projected Clearance Date */}
-          <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-800 flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-sm shadow-indigo-600/30">
+          <div className="p-3.5 rounded-surface bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/60 dark:border-zinc-800 flex items-center gap-3">
+            <div className="w-9 h-9 rounded-surface bg-indigo-600 text-white flex items-center justify-center shrink-0 ">
               <CalendarCheck className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
+              <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">
                 Debt-Free Target Date
               </span>
-              <span className="text-xs font-black text-slate-800 dark:text-slate-100">
-                {isFullyPaid ? 'Debt 100% Cleared 🎉' : estimatedPayoffDate}
+              <span className="text-xs font-black text-zinc-800 dark:text-zinc-100">
+                {isFullyPaid ? 'Debt 100% Cleared ' : estimatedPayoffDate}
               </span>
             </div>
           </div>
@@ -693,33 +693,31 @@ Logs Recorded: ${payments.length} installments`;
 
       {/* Dynamic Payoff Speed Calculator based on deposit pattern */}
       {!isFullyPaid && (
-        <div className="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white rounded-[28px] sm:rounded-[36px] p-5 sm:p-7 shadow-xl border border-indigo-900/60 relative overflow-hidden">
-          {/* Subtle background glow */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="bg-zinc-900 text-white rounded-surface p-5 sm:p-7 shadow-floating border border-zinc-800 relative overflow-hidden">
 
           {/* Calculator Header & Pattern Overview */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-indigo-900/70">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-400/40 text-amber-400 flex items-center justify-center shrink-0">
+              <div className="w-8 h-8 rounded-surface bg-amber-500/20 border border-amber-400/40 text-amber-400 flex items-center justify-center shrink-0">
                 <Zap className="w-4 h-4" />
               </div>
               <div>
                 <h3 className="text-sm font-bold uppercase tracking-wider text-amber-400 flex items-center gap-2">
                   <span>Payoff Speed Calculator</span>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                  <span className="text-xs px-2 py-0.5 rounded-full font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30">
                     Dynamic
                   </span>
                 </h3>
-                <p className="text-xs text-slate-300">
+                <p className="text-xs text-zinc-300">
                   Calculates exact remaining time in years, months, and days based on your actual deposit history.
                 </p>
               </div>
             </div>
 
             {/* Current Pattern Badge */}
-            <div className="flex items-center gap-2 self-start sm:self-auto bg-slate-800/80 border border-slate-700/80 px-3 py-1.5 rounded-xl text-xs">
+            <div className="flex items-center gap-2 self-start sm:self-auto bg-zinc-800/80 border border-zinc-700/80 px-3 py-1.5 rounded-surface text-xs">
               <BarChart3 className="w-3.5 h-3.5 text-amber-400" />
-              <span className="text-slate-300">Active Velocity:</span>
+              <span className="text-zinc-300">Active Velocity:</span>
               <strong className="text-amber-300 font-mono-num">
                 ~{formatUGX(activeDailyVelocity)}/day
               </strong>
@@ -727,49 +725,49 @@ Logs Recorded: ${payments.length} installments`;
           </div>
 
           {/* Dynamic Countdown Display (Years, Months, Days) */}
-          <div className="my-5 p-4 sm:p-5 rounded-2xl bg-slate-950/70 border border-indigo-800/50">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-300 block mb-3">
+          <div className="my-5 p-4 sm:p-5 rounded-surface bg-zinc-950/70 border border-indigo-800/50">
+            <span className="text-xs font-bold uppercase tracking-wider text-indigo-300 block mb-3">
               Remaining Payoff Duration ({calculatorMode === 'pattern' ? patternAnalysis.paceLabel : `${formatUGX(activeDailyVelocity)}/day`})
             </span>
 
             <div className="grid grid-cols-3 gap-2.5 sm:gap-4 text-center">
               {/* Years */}
-              <div className="bg-slate-900/90 border border-indigo-900/70 rounded-2xl p-3 sm:p-4">
+              <div className="bg-zinc-900/90 border border-indigo-900/70 rounded-surface p-3 sm:p-4">
                 <div className="text-2xl sm:text-4xl font-black text-amber-400 font-mono-num">
                   {currentPayoffEstimate.years}
                 </div>
-                <div className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-400 mt-1">
+                <div className="text-xs sm:text-xs font-bold uppercase tracking-wider text-zinc-400 mt-1">
                   {currentPayoffEstimate.years === 1 ? 'Year' : 'Years'}
                 </div>
               </div>
 
               {/* Months */}
-              <div className="bg-slate-900/90 border border-indigo-900/70 rounded-2xl p-3 sm:p-4">
+              <div className="bg-zinc-900/90 border border-indigo-900/70 rounded-surface p-3 sm:p-4">
                 <div className="text-2xl sm:text-4xl font-black text-amber-300 font-mono-num">
                   {currentPayoffEstimate.months}
                 </div>
-                <div className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-400 mt-1">
+                <div className="text-xs sm:text-xs font-bold uppercase tracking-wider text-zinc-400 mt-1">
                   {currentPayoffEstimate.months === 1 ? 'Month' : 'Months'}
                 </div>
               </div>
 
               {/* Days */}
-              <div className="bg-slate-900/90 border border-indigo-900/70 rounded-2xl p-3 sm:p-4">
+              <div className="bg-zinc-900/90 border border-indigo-900/70 rounded-surface p-3 sm:p-4">
                 <div className="text-2xl sm:text-4xl font-black text-emerald-400 font-mono-num">
                   {currentPayoffEstimate.days}
                 </div>
-                <div className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-400 mt-1">
+                <div className="text-xs sm:text-xs font-bold uppercase tracking-wider text-zinc-400 mt-1">
                   {currentPayoffEstimate.days === 1 ? 'Day' : 'Days'}
                 </div>
               </div>
             </div>
 
             {/* Detailed summary row below counters */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mt-4 pt-3 border-t border-slate-800/80 text-xs">
-              <div className="text-slate-200">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mt-4 pt-3 border-t border-zinc-800/80 text-xs">
+              <div className="text-zinc-200">
                 Total Remaining: <strong className="text-white font-mono-num">~{currentPayoffEstimate.totalDays} days</strong> ({currentPayoffEstimate.breakdownText})
               </div>
-              <div className="text-slate-300 flex items-center gap-1.5">
+              <div className="text-zinc-300 flex items-center gap-1.5">
                 <CalendarDays className="w-3.5 h-3.5 text-amber-400" />
                 <span>Projected Completion:</span>
                 <strong className="text-amber-300">{currentPayoffEstimate.finishDate}</strong>
@@ -780,11 +778,11 @@ Logs Recorded: ${payments.length} installments`;
           {/* Interactive Pace Selector Buttons */}
           <div>
             <div className="flex items-center justify-between gap-2 mb-2">
-              <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+              <span className="text-xs font-bold text-zinc-300 uppercase tracking-wider">
                 Compare Payoff Paces:
               </span>
               {patternAnalysis.hasHistory && (
-                <span className="text-[11px] text-amber-400">
+                <span className="text-xs text-amber-400">
                   {patternAnalysis.totalDepositCount} past deposits analyzed
                 </span>
               )}
@@ -797,20 +795,20 @@ Logs Recorded: ${payments.length} installments`;
                 whileTap={{ scale: 0.97 }}
                 type="button"
                 onClick={() => setCalculatorMode('pattern')}
-                className={`p-2.5 rounded-xl font-bold border transition-all text-left ${
+                className={`p-2.5 rounded-surface font-bold border transition-all text-left ${
                   calculatorMode === 'pattern'
-                    ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-md shadow-amber-500/20'
-                    : 'bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 border-slate-700/80'
+                    ? 'bg-amber-500 text-zinc-950 border-amber-400 '
+                    : 'bg-zinc-800/80 hover:bg-zinc-700/80 text-zinc-300 border-zinc-700/80'
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] uppercase tracking-wider">My Pattern</span>
-                  <Sparkles className="w-3 h-3" />
+                  <span className="text-xs uppercase tracking-wider">My Pattern</span>
+                  <Target className="w-3 h-3" />
                 </div>
                 <div className="text-xs font-black font-mono-num mt-0.5">
                   ~{formatUGX(patternAnalysis.dailyPace)}/d
                 </div>
-                <div className="text-[10px] opacity-80 truncate mt-0.5">
+                <div className="text-xs opacity-80 truncate mt-0.5">
                   {patternPayoffEstimate.displayBadge}
                 </div>
               </motion.button>
@@ -821,20 +819,20 @@ Logs Recorded: ${payments.length} installments`;
                 whileTap={{ scale: 0.97 }}
                 type="button"
                 onClick={() => setCalculatorMode('minimum')}
-                className={`p-2.5 rounded-xl font-bold border transition-all text-left ${
+                className={`p-2.5 rounded-surface font-bold border transition-all text-left ${
                   calculatorMode === 'minimum'
-                    ? 'bg-indigo-600 text-white border-indigo-400 shadow-md shadow-indigo-500/20'
-                    : 'bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 border-slate-700/80'
+                    ? 'bg-indigo-600 text-white border-indigo-400 '
+                    : 'bg-zinc-800/80 hover:bg-zinc-700/80 text-zinc-300 border-zinc-700/80'
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] uppercase tracking-wider">Min Target</span>
+                  <span className="text-xs uppercase tracking-wider">Min Target</span>
                   <Target className="w-3 h-3" />
                 </div>
                 <div className="text-xs font-black font-mono-num mt-0.5">
                   {formatUGX(dailyMin)}/d
                 </div>
-                <div className="text-[10px] opacity-80 truncate mt-0.5">
+                <div className="text-xs opacity-80 truncate mt-0.5">
                   {minPacePayoffEstimate.displayBadge}
                 </div>
               </motion.button>
@@ -845,20 +843,20 @@ Logs Recorded: ${payments.length} installments`;
                 whileTap={{ scale: 0.97 }}
                 type="button"
                 onClick={() => setCalculatorMode('moderate')}
-                className={`p-2.5 rounded-xl font-bold border transition-all text-left ${
+                className={`p-2.5 rounded-surface font-bold border transition-all text-left ${
                   calculatorMode === 'moderate'
-                    ? 'bg-indigo-600 text-white border-indigo-400 shadow-md shadow-indigo-500/20'
-                    : 'bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 border-slate-700/80'
+                    ? 'bg-indigo-600 text-white border-indigo-400 '
+                    : 'bg-zinc-800/80 hover:bg-zinc-700/80 text-zinc-300 border-zinc-700/80'
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] uppercase tracking-wider">Moderate</span>
+                  <span className="text-xs uppercase tracking-wider">Moderate</span>
                   <Zap className="w-3 h-3" />
                 </div>
                 <div className="text-xs font-black font-mono-num mt-0.5">
                   5,000 UGX/d
                 </div>
-                <div className="text-[10px] opacity-80 truncate mt-0.5">
+                <div className="text-xs opacity-80 truncate mt-0.5">
                   {formatPayoffDuration(5000, remaining).displayBadge}
                 </div>
               </motion.button>
@@ -869,20 +867,20 @@ Logs Recorded: ${payments.length} installments`;
                 whileTap={{ scale: 0.97 }}
                 type="button"
                 onClick={() => setCalculatorMode('turbo')}
-                className={`p-2.5 rounded-xl font-bold border transition-all text-left ${
+                className={`p-2.5 rounded-surface font-bold border transition-all text-left ${
                   calculatorMode === 'turbo'
-                    ? 'bg-emerald-600 text-white border-emerald-400 shadow-md shadow-emerald-500/20'
-                    : 'bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 border-slate-700/80'
+                    ? 'bg-emerald-600 text-white border-emerald-400 '
+                    : 'bg-zinc-800/80 hover:bg-zinc-700/80 text-zinc-300 border-zinc-700/80'
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] uppercase tracking-wider">Turbo</span>
+                  <span className="text-xs uppercase tracking-wider">Turbo</span>
                   <Flame className="w-3 h-3" />
                 </div>
                 <div className="text-xs font-black font-mono-num mt-0.5">
                   10,000 UGX/d
                 </div>
-                <div className="text-[10px] opacity-80 truncate mt-0.5">
+                <div className="text-xs opacity-80 truncate mt-0.5">
                   {formatPayoffDuration(10000, remaining).displayBadge}
                 </div>
               </motion.button>
@@ -893,20 +891,20 @@ Logs Recorded: ${payments.length} installments`;
                 whileTap={{ scale: 0.97 }}
                 type="button"
                 onClick={() => setCalculatorMode('custom')}
-                className={`p-2.5 rounded-xl font-bold border transition-all text-left col-span-2 sm:col-span-1 ${
+                className={`p-2.5 rounded-surface font-bold border transition-all text-left col-span-2 sm:col-span-1 ${
                   calculatorMode === 'custom'
-                    ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-md shadow-amber-500/20'
-                    : 'bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 border-slate-700/80'
+                    ? 'bg-amber-500 text-zinc-950 border-amber-400 '
+                    : 'bg-zinc-800/80 hover:bg-zinc-700/80 text-zinc-300 border-zinc-700/80'
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] uppercase tracking-wider">Custom</span>
+                  <span className="text-xs uppercase tracking-wider">Custom</span>
                   <Sliders className="w-3 h-3" />
                 </div>
                 <div className="text-xs font-black font-mono-num mt-0.5">
                   {formatUGX(customPace)}/d
                 </div>
-                <div className="text-[10px] opacity-80 truncate mt-0.5">
+                <div className="text-xs opacity-80 truncate mt-0.5">
                   {formatPayoffDuration(customPace, remaining).displayBadge}
                 </div>
               </motion.button>
@@ -922,9 +920,9 @@ Logs Recorded: ${payments.length} installments`;
                   transition={{ duration: 0.22, ease: [0.25, 1, 0.5, 1] }}
                   className="overflow-hidden"
                 >
-                  <div className="mt-3 p-3 rounded-xl bg-slate-950/60 border border-slate-800 space-y-2">
+                  <div className="mt-3 p-3 rounded-surface bg-zinc-950/60 border border-zinc-800 space-y-2">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-slate-400">Slide to test daily payment capability:</span>
+                      <span className="text-zinc-400">Slide to test daily payment capability:</span>
                       <span className="font-mono-num font-black text-amber-400">{formatUGX(customPace)} / day</span>
                     </div>
                     <input
@@ -936,7 +934,7 @@ Logs Recorded: ${payments.length} installments`;
                       onChange={(e) => setCustomPace(parseInt(e.target.value, 10))}
                       className="w-full accent-amber-500 cursor-pointer"
                     />
-                    <div className="flex justify-between text-[10px] text-slate-500 font-mono">
+                    <div className="flex justify-between text-xs text-zinc-500 font-mono">
                       <span>1,000 UGX</span>
                       <span>15,000 UGX</span>
                       <span>30,000 UGX</span>
@@ -948,7 +946,7 @@ Logs Recorded: ${payments.length} installments`;
           </div>
 
           {/* Dynamic Velocity Insights Callout */}
-          <div className="mt-4 p-3 rounded-xl bg-slate-800/50 border border-slate-700/60 text-xs text-slate-300 flex items-start gap-2.5">
+          <div className="mt-4 p-3 rounded-surface bg-zinc-800/50 border border-zinc-700/60 text-xs text-zinc-300 flex items-start gap-2.5">
             <Info className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
             <div className="space-y-1">
               <p>
@@ -956,11 +954,11 @@ Logs Recorded: ${payments.length} installments`;
               </p>
               {patternAnalysis.dailyPace > dailyMin ? (
                 <p className="text-emerald-300 font-medium">
-                  🚀 Your actual deposit velocity will clear this debt ~<strong>{Math.max(0, minPacePayoffEstimate.totalDays - patternPayoffEstimate.totalDays)} days earlier</strong> than the minimum quota!
+                  Your actual deposit velocity will clear this debt ~<strong>{Math.max(0, minPacePayoffEstimate.totalDays - patternPayoffEstimate.totalDays)} days earlier</strong> than the minimum quota!
                 </p>
               ) : patternAnalysis.hasHistory ? (
                 <p className="text-amber-200">
-                  💡 Tip: Increasing your daily deposit to 5,000 UGX/day would cut your payoff duration down to <strong>{formatPayoffDuration(5000, remaining).breakdownText}</strong>.
+                  Tip: Increasing your daily deposit to 5,000 UGX/day would cut your payoff duration down to <strong>{formatPayoffDuration(5000, remaining).breakdownText}</strong>.
                 </p>
               ) : null}
             </div>
@@ -969,16 +967,16 @@ Logs Recorded: ${payments.length} installments`;
       )}
 
       {/* Log Payment Quick Action Form */}
-      <div className="bg-white dark:bg-slate-900 rounded-[32px] sm:rounded-[40px] p-6 sm:p-8 shadow-sm border border-slate-100 dark:border-slate-800 transition-colors">
-        <div className="flex items-center gap-3 pb-5 border-b border-slate-100 dark:border-slate-800">
-          <div className="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center shadow-lg shadow-amber-500/25 shrink-0">
+      <div className="bg-white dark:bg-zinc-900 rounded-surface sm:rounded-surface p-6 sm:p-8  border border-zinc-100 dark:border-zinc-800 transition-colors">
+        <div className="flex items-center gap-3 pb-5 border-b border-zinc-100 dark:border-zinc-800">
+          <div className="w-12 h-12 rounded-surface bg-amber-500 text-white flex items-center justify-center  shrink-0">
             <Receipt className="w-6 h-6" />
           </div>
           <div>
-            <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+            <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
               Pay Installment
             </span>
-            <h3 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
+            <h3 className="text-xl font-bold text-zinc-900 dark:text-white tracking-tight">
               Log Office Debt Payment
             </h3>
           </div>
@@ -987,7 +985,7 @@ Logs Recorded: ${payments.length} installments`;
         <form onSubmit={handlePaySubmit} className="mt-6 space-y-5">
           {/* Quick Preset Buttons */}
           <div>
-            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-2">
+            <label className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider block mb-2">
               Select or Enter Installment Amount
             </label>
             <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 mb-3">
@@ -1000,14 +998,14 @@ Logs Recorded: ${payments.length} installments`;
                     key={amt}
                     type="button"
                     onClick={() => setQuickAmount(amt.toString())}
-                    className={`py-2.5 px-2 rounded-xl text-xs font-bold transition-all border text-center ${
+                    className={`py-2.5 px-2 rounded-surface text-xs font-bold transition-all border text-center ${
                       isSelected
-                        ? 'bg-amber-500 text-white border-amber-600 shadow-sm shadow-amber-500/30'
-                        : 'bg-slate-50 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                        ? 'bg-amber-500 text-white border-amber-600 '
+                        : 'bg-zinc-50 dark:bg-zinc-800/80 border-zinc-200 dark:border-zinc-700/80 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                     }`}
                   >
-                    +{formatUGXShort(amt)}
-                    {amt === 2000 && <span className="block text-[9px] font-normal opacity-90">Daily Min</span>}
+                    +{formatUGX(amt)}
+                    {amt === 2000 && <span className="block text-xs font-normal opacity-90">Daily Min</span>}
                   </motion.button>
                 );
               })}
@@ -1015,7 +1013,7 @@ Logs Recorded: ${payments.length} installments`;
 
             {/* Custom Amount Input */}
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold font-mono text-sm">
+              <span className="absolute left-4 top-1/2 -tranzinc-y-1/2 text-zinc-400 font-bold font-mono text-sm">
                 UGX
               </span>
               <input
@@ -1024,7 +1022,7 @@ Logs Recorded: ${payments.length} installments`;
                 value={quickAmount}
                 onChange={(e) => setQuickAmount(e.target.value)}
                 placeholder="2,000"
-                className="w-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 rounded-2xl pl-16 pr-4 py-3.5 text-slate-900 dark:text-white font-mono text-base font-bold outline-none focus:ring-2 focus:ring-amber-500"
+                className="w-full bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/80 rounded-surface pl-16 pr-4 py-3.5 text-zinc-900 dark:text-white font-mono text-base font-bold outline-none focus:ring-2 focus:ring-amber-500"
               />
             </div>
           </div>
@@ -1032,14 +1030,14 @@ Logs Recorded: ${payments.length} installments`;
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Payment Method Selector - Defaults to Cash */}
             <div>
-              <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-2">
+              <label className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider block mb-2">
                 Payment Channel (Default: Cash)
               </label>
               <select
                 id="debt-payment-method-select"
                 value={selectedMethod}
                 onChange={(e) => setSelectedMethod(e.target.value as PaymentMethod)}
-                className="w-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 rounded-2xl px-4 py-3 text-slate-900 dark:text-white font-bold text-xs outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer"
+                className="w-full bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/80 rounded-surface px-4 py-3 text-zinc-900 dark:text-white font-bold text-xs outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer"
               >
                 {PAYMENT_METHODS.map((m) => (
                   <option key={m.id} value={m.id}>
@@ -1051,7 +1049,7 @@ Logs Recorded: ${payments.length} installments`;
 
             {/* Payment Date */}
             <div>
-              <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-2">
+              <label className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider block mb-2">
                 Payment Date
               </label>
               <input
@@ -1059,14 +1057,14 @@ Logs Recorded: ${payments.length} installments`;
                 type="date"
                 value={paymentDate}
                 onChange={(e) => setPaymentDate(e.target.value)}
-                className="w-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 rounded-2xl px-4 py-3 text-slate-900 dark:text-white font-mono text-xs font-bold outline-none focus:ring-2 focus:ring-amber-500"
+                className="w-full bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/80 rounded-surface px-4 py-3 text-zinc-900 dark:text-white font-mono text-xs font-bold outline-none focus:ring-2 focus:ring-amber-500"
               />
             </div>
           </div>
 
           {/* Optional Note / Receipt Reference */}
           <div>
-            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">
+            <label className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider block mb-1">
               Note or Receipt Reference (Optional)
             </label>
             <input
@@ -1075,7 +1073,7 @@ Logs Recorded: ${payments.length} installments`;
               value={paymentNote}
               onChange={(e) => setPaymentNote(e.target.value)}
               placeholder="e.g. Daily office debt installment, Cash payment"
-              className="w-full bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 rounded-2xl px-4 py-3 text-slate-900 dark:text-white text-xs outline-none focus:ring-2 focus:ring-amber-500"
+              className="w-full bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/80 rounded-surface px-4 py-3 text-zinc-900 dark:text-white text-xs outline-none focus:ring-2 focus:ring-amber-500"
             />
           </div>
 
@@ -1085,7 +1083,7 @@ Logs Recorded: ${payments.length} installments`;
             id="debt-save-payment-submit-btn"
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-amber-500 hover:bg-amber-600 active:scale-[0.99] text-white py-3.5 rounded-2xl font-black text-sm uppercase tracking-wider shadow-lg shadow-amber-500/25 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+            className="w-full bg-amber-500 hover:bg-amber-600 active:scale-[0.99] text-white py-3.5 rounded-surface font-black text-sm uppercase tracking-wider  transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
           >
             <CheckCircle2 className="w-5 h-5" />
             <span>Record Debt Payment</span>
@@ -1094,15 +1092,15 @@ Logs Recorded: ${payments.length} installments`;
       </div>
 
       {/* Grouped Transaction History (Collapsible: Today, Yesterday, This Week, Last Week, Earlier This Month, Last Month, Older) */}
-      <div className="bg-white dark:bg-slate-900 rounded-[32px] sm:rounded-[40px] p-6 sm:p-8 shadow-sm border border-slate-100 dark:border-slate-800 transition-colors">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-slate-100 dark:border-slate-800">
+      <div className="bg-white dark:bg-zinc-900 rounded-surface sm:rounded-surface p-6 sm:p-8  border border-zinc-100 dark:border-zinc-800 transition-colors">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-zinc-100 dark:border-zinc-800">
           <div>
-            <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+            <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
               Transaction History
             </span>
-            <h3 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+            <h3 className="text-xl font-bold text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
               <span>Office Debt Payments</span>
-              <span className="text-xs font-mono font-normal px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+              <span className="text-xs font-mono font-normal px-2.5 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300">
                 {payments.length} installments
               </span>
             </h3>
@@ -1114,7 +1112,7 @@ Logs Recorded: ${payments.length} installments`;
               <button
                 type="button"
                 onClick={toggleAllGroups}
-                className="text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700"
+                className="text-xs font-bold text-zinc-500 dark:text-zinc-400 hover:text-amber-600 dark:hover:text-amber-400 transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-surface bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700"
               >
                 <Layers className="w-3.5 h-3.5" />
                 <span>
@@ -1125,7 +1123,7 @@ Logs Recorded: ${payments.length} installments`;
               <button
                 type="button"
                 onClick={() => setIsResetConfirmOpen(true)}
-                className="text-xs font-bold text-slate-400 hover:text-rose-500 transition-colors flex items-center gap-1"
+                className="text-xs font-bold text-zinc-400 hover:text-rose-500 transition-colors flex items-center gap-1"
                 title="Reset debt cycle"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
@@ -1136,8 +1134,8 @@ Logs Recorded: ${payments.length} installments`;
         </div>
 
         {payments.length === 0 ? (
-          <div className="py-12 text-center text-slate-400 dark:text-slate-500 space-y-2">
-            <Landmark className="w-12 h-12 mx-auto text-slate-300 dark:text-slate-700 stroke-[1.5]" />
+          <div className="py-12 text-center text-zinc-400 dark:text-zinc-500 space-y-2">
+            <Landmark className="w-12 h-12 mx-auto text-zinc-300 dark:text-zinc-700 stroke-[1.5]" />
             <p className="text-sm font-semibold">No debt payments logged yet</p>
             <p className="text-xs max-w-sm mx-auto">
               Start logging your daily installments above (at least 2,000 UGX/day) to track your path to being debt free.
@@ -1151,28 +1149,28 @@ Logs Recorded: ${payments.length} installments`;
               return (
                 <div
                   key={group.key}
-                  className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 overflow-hidden transition-all"
+                  className="rounded-surface border border-zinc-200/80 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 overflow-hidden transition-all"
                 >
                   {/* Collapsible Group Header */}
                   <button
                     type="button"
                     onClick={() => toggleGroup(group.key)}
-                    className="w-full flex items-center justify-between gap-3 p-3.5 sm:p-4 text-left hover:bg-slate-100/70 dark:hover:bg-slate-800/60 transition-colors cursor-pointer"
+                    className="w-full flex items-center justify-between gap-3 p-3.5 sm:p-4 text-left hover:bg-zinc-100/70 dark:hover:bg-zinc-800/60 transition-colors cursor-pointer"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-7 h-7 rounded-lg bg-slate-200/80 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center shrink-0">
+                      <div className="w-7 h-7 rounded-surface bg-zinc-200/80 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 flex items-center justify-center shrink-0">
                         <ChevronDown
                           className={`w-4 h-4 transition-transform duration-200 ${
-                            isCollapsed ? '-rotate-90 text-slate-400' : 'rotate-0 text-slate-600 dark:text-slate-300'
+                            isCollapsed ? '-rotate-90 text-zinc-400' : 'rotate-0 text-zinc-600 dark:text-zinc-300'
                           }`}
                         />
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
-                          <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                          <h4 className="text-sm font-bold text-zinc-900 dark:text-white">
                             {group.title}
                           </h4>
-                          <span className="text-[11px] font-mono text-slate-400 dark:text-slate-500">
+                          <span className="text-xs font-mono text-zinc-400 dark:text-zinc-500">
                             • {group.subtitle}
                           </span>
                         </div>
@@ -1180,7 +1178,7 @@ Logs Recorded: ${payments.length} installments`;
                     </div>
 
                     <div className="flex items-center gap-2.5 shrink-0">
-                      <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-200/70 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                      <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-zinc-200/70 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300">
                         {group.count} {group.count === 1 ? 'installment' : 'installments'}
                       </span>
                       <span className="text-xs sm:text-sm font-black font-mono-num text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-900/60 px-2.5 py-0.5 rounded-full">
@@ -1200,34 +1198,34 @@ Logs Recorded: ${payments.length} installments`;
                         transition={{ duration: 0.24, ease: [0.25, 1, 0.5, 1] }}
                         className="overflow-hidden"
                       >
-                        <div className="border-t border-slate-200/60 dark:border-slate-800/80 divide-y divide-slate-200/60 dark:divide-slate-800/60 bg-white dark:bg-slate-900">
+                        <div className="border-t border-zinc-200/60 dark:border-zinc-800/80 divide-y divide-zinc-200/60 dark:divide-zinc-800/60 bg-white dark:bg-zinc-900">
                           {group.payments.map((p) => {
                             const methodMeta = PAYMENT_METHODS.find((m) => m.id === p.paymentMethod);
 
                             return (
                               <div
                                 key={p.id}
-                                className="p-3 sm:p-4 flex items-center justify-between gap-3 hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors"
+                                className="p-3 sm:p-4 flex items-center justify-between gap-3 hover:bg-zinc-50/70 dark:hover:bg-zinc-800/40 transition-colors"
                               >
                                 <div className="flex items-center gap-3 min-w-0">
-                                  <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-900/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                                  <div className="w-9 h-9 rounded-surface bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-900/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
                                     <TrendingDown className="w-4 h-4" />
                                   </div>
 
                                   <div className="min-w-0">
                                     <div className="flex items-center gap-2 flex-wrap">
-                                      <span className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">
+                                      <span className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-white truncate">
                                         {p.note || 'Office debt installment'}
                                       </span>
                                       {methodMeta && (
                                         <span
-                                          className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${methodMeta.badgeBg} ${methodMeta.textColor} ${methodMeta.borderColor}`}
+                                          className={`text-xs px-2 py-0.5 rounded-full font-bold border ${methodMeta.badgeBg} ${methodMeta.textColor} ${methodMeta.borderColor}`}
                                         >
                                           {methodMeta.shortName}
                                         </span>
                                       )}
                                     </div>
-                                    <span className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 block font-mono">
+                                    <span className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5 block font-mono">
                                       {p.date}
                                     </span>
                                   </div>
@@ -1242,7 +1240,7 @@ Logs Recorded: ${payments.length} installments`;
                                     <button
                                       type="button"
                                       onClick={() => handleOpenEdit(p)}
-                                      className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                                      className="p-1.5 rounded-surface text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                                       title="Edit payment"
                                     >
                                       <Edit3 className="w-3.5 h-3.5" />
@@ -1250,7 +1248,7 @@ Logs Recorded: ${payments.length} installments`;
                                     <button
                                       type="button"
                                       onClick={() => setPaymentToDelete(p)}
-                                      className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/60 transition-colors"
+                                      className="p-1.5 rounded-surface text-zinc-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/60 transition-colors"
                                       title="Delete payment"
                                     >
                                       <Trash2 className="w-3.5 h-3.5" />
@@ -1278,43 +1276,43 @@ Logs Recorded: ${payments.length} installments`;
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 "
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
               transition={{ duration: 0.18, ease: 'easeOut' }}
-              className="bg-white dark:bg-slate-900 rounded-[32px] p-6 sm:p-7 max-w-md w-full shadow-2xl border border-slate-100 dark:border-slate-800 space-y-4"
+              className="bg-white dark:bg-zinc-900 rounded-surface p-6 sm:p-7 max-w-md w-full shadow-floating border border-zinc-100 dark:border-zinc-800 space-y-4"
             >
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">Edit Debt Payment</h3>
+              <h3 className="text-lg font-bold text-zinc-900 dark:text-white">Edit Debt Payment</h3>
               <form onSubmit={handleSaveEdit} className="space-y-4">
                 <div>
-                  <label className="text-xs font-bold text-slate-500 uppercase block mb-1">Amount (UGX)</label>
+                  <label className="text-xs font-bold text-zinc-500 uppercase block mb-1">Amount (UGX)</label>
                   <input
                     type="text"
                     value={editAmount}
                     onChange={(e) => setEditAmount(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white font-mono font-bold text-sm outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-surface px-4 py-2.5 text-zinc-900 dark:text-white font-mono font-bold text-sm outline-none focus:ring-2 focus:ring-amber-500"
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-slate-500 uppercase block mb-1">Date</label>
+                  <label className="text-xs font-bold text-zinc-500 uppercase block mb-1">Date</label>
                   <input
                     type="date"
                     value={editDate}
                     onChange={(e) => setEditDate(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white font-mono text-xs font-bold outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-surface px-4 py-2.5 text-zinc-900 dark:text-white font-mono text-xs font-bold outline-none focus:ring-2 focus:ring-amber-500"
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-slate-500 uppercase block mb-1">Payment Method</label>
+                  <label className="text-xs font-bold text-zinc-500 uppercase block mb-1">Payment Method</label>
                   <select
                     value={editMethod}
                     onChange={(e) => setEditMethod(e.target.value as PaymentMethod)}
-                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white text-xs font-bold outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-surface px-4 py-2.5 text-zinc-900 dark:text-white text-xs font-bold outline-none focus:ring-2 focus:ring-amber-500"
                   >
                     {PAYMENT_METHODS.map((m) => (
                       <option key={m.id} value={m.id}>
@@ -1325,12 +1323,12 @@ Logs Recorded: ${payments.length} installments`;
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-slate-500 uppercase block mb-1">Note</label>
+                  <label className="text-xs font-bold text-zinc-500 uppercase block mb-1">Note</label>
                   <input
                     type="text"
                     value={editNote}
                     onChange={(e) => setEditNote(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white text-xs outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-surface px-4 py-2.5 text-zinc-900 dark:text-white text-xs outline-none focus:ring-2 focus:ring-amber-500"
                   />
                 </div>
 
@@ -1338,13 +1336,13 @@ Logs Recorded: ${payments.length} installments`;
                   <button
                     type="button"
                     onClick={() => setEditingPayment(null)}
-                    className="flex-1 py-2.5 rounded-xl font-bold text-xs bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
+                    className="flex-1 py-2.5 rounded-surface font-bold text-xs bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 py-2.5 rounded-xl font-bold text-xs bg-amber-500 text-white shadow-md shadow-amber-500/20"
+                    className="flex-1 py-2.5 rounded-surface font-bold text-xs bg-amber-500 text-white "
                   >
                     Save Changes
                   </button>
@@ -1362,28 +1360,28 @@ Logs Recorded: ${payments.length} installments`;
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 "
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
               transition={{ duration: 0.18, ease: 'easeOut' }}
-              className="bg-white dark:bg-slate-900 rounded-[32px] p-6 max-w-sm w-full shadow-2xl border border-slate-100 dark:border-slate-800 space-y-4 text-center"
+              className="bg-white dark:bg-zinc-900 rounded-surface p-6 max-w-sm w-full shadow-floating border border-zinc-100 dark:border-zinc-800 space-y-4 text-center"
             >
-              <div className="w-12 h-12 rounded-2xl bg-rose-100 dark:bg-rose-950 text-rose-600 mx-auto flex items-center justify-center">
+              <div className="w-12 h-12 rounded-surface bg-rose-100 dark:bg-rose-950 text-rose-600 mx-auto flex items-center justify-center">
                 <Trash2 className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-slate-900 dark:text-white">Delete Payment Record?</h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                <h3 className="text-base font-bold text-zinc-900 dark:text-white">Delete Payment Record?</h3>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
                   Remove installment of <strong>{formatUGX(paymentToDelete.amount)}</strong> recorded on {paymentToDelete.date}?
                 </p>
               </div>
               <div className="flex gap-2 pt-2">
                 <button
                   onClick={() => setPaymentToDelete(null)}
-                  className="flex-1 py-2.5 rounded-xl font-bold text-xs bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
+                  className="flex-1 py-2.5 rounded-surface font-bold text-xs bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300"
                 >
                   Cancel
                 </button>
@@ -1392,7 +1390,7 @@ Logs Recorded: ${payments.length} installments`;
                     await onDeletePayment(paymentToDelete);
                     setPaymentToDelete(null);
                   }}
-                  className="flex-1 py-2.5 rounded-xl font-bold text-xs bg-rose-600 text-white shadow-md shadow-rose-600/20"
+                  className="flex-1 py-2.5 rounded-surface font-bold text-xs bg-rose-600 text-white "
                 >
                   Delete
                 </button>
@@ -1409,21 +1407,21 @@ Logs Recorded: ${payments.length} installments`;
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 "
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
               transition={{ duration: 0.18, ease: 'easeOut' }}
-              className="bg-white dark:bg-slate-900 rounded-[32px] p-6 max-w-sm w-full shadow-2xl border border-slate-100 dark:border-slate-800 space-y-4 text-center"
+              className="bg-white dark:bg-zinc-900 rounded-surface p-6 max-w-sm w-full shadow-floating border border-zinc-100 dark:border-zinc-800 space-y-4 text-center"
             >
-              <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-950 text-amber-600 mx-auto flex items-center justify-center">
+              <div className="w-12 h-12 rounded-surface bg-amber-100 dark:bg-amber-950 text-amber-600 mx-auto flex items-center justify-center">
                 <RefreshCw className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-slate-900 dark:text-white">Reset Debt Progress?</h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                <h3 className="text-base font-bold text-zinc-900 dark:text-white">Reset Debt Progress?</h3>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
                   This will reset all office debt payment records to 0 UGX. Target and config will remain intact.
                 </p>
               </div>
@@ -1431,7 +1429,7 @@ Logs Recorded: ${payments.length} installments`;
                 <button
                   type="button"
                   onClick={() => setIsResetConfirmOpen(false)}
-                  className="flex-1 py-2.5 rounded-xl font-bold text-xs bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
+                  className="flex-1 py-2.5 rounded-surface font-bold text-xs bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300"
                 >
                   Cancel
                 </button>
@@ -1441,7 +1439,7 @@ Logs Recorded: ${payments.length} installments`;
                     await onResetDebtProgress();
                     setIsResetConfirmOpen(false);
                   }}
-                  className="flex-1 py-2.5 rounded-xl font-bold text-xs bg-rose-600 text-white shadow-md shadow-rose-600/20"
+                  className="flex-1 py-2.5 rounded-surface font-bold text-xs bg-rose-600 text-white "
                 >
                   Confirm Reset
                 </button>
@@ -1453,38 +1451,38 @@ Logs Recorded: ${payments.length} installments`;
 
       {/* Debt Config Modal */}
       {isConfigOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in">
-          <div className="bg-white dark:bg-slate-900 rounded-[32px] p-6 sm:p-7 max-w-md w-full shadow-2xl border border-slate-100 dark:border-slate-800 space-y-4">
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Office Debt Target Configuration</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60  animate-in fade-in">
+          <div className="bg-white dark:bg-zinc-900 rounded-surface p-6 sm:p-7 max-w-md w-full shadow-floating border border-zinc-100 dark:border-zinc-800 space-y-4">
+            <h3 className="text-lg font-bold text-zinc-900 dark:text-white">Office Debt Target Configuration</h3>
             <form onSubmit={handleSaveConfig} className="space-y-4">
               <div>
-                <label className="text-xs font-bold text-slate-500 uppercase block mb-1">Total Debt Amount (UGX)</label>
+                <label className="text-xs font-bold text-zinc-500 uppercase block mb-1">Total Debt Amount (UGX)</label>
                 <input
                   type="text"
                   value={configTotal}
                   onChange={(e) => setConfigTotal(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white font-mono font-bold text-sm outline-none focus:ring-2 focus:ring-amber-500"
+                  className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-surface px-4 py-2.5 text-zinc-900 dark:text-white font-mono font-bold text-sm outline-none focus:ring-2 focus:ring-amber-500"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-500 uppercase block mb-1">Minimum Daily Payment (UGX)</label>
+                <label className="text-xs font-bold text-zinc-500 uppercase block mb-1">Minimum Daily Payment (UGX)</label>
                 <input
                   type="text"
                   value={configDailyMin}
                   onChange={(e) => setConfigDailyMin(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white font-mono font-bold text-sm outline-none focus:ring-2 focus:ring-amber-500"
+                  className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-surface px-4 py-2.5 text-zinc-900 dark:text-white font-mono font-bold text-sm outline-none focus:ring-2 focus:ring-amber-500"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-500 uppercase block mb-1">Creditor / Office Entity</label>
+                <label className="text-xs font-bold text-zinc-500 uppercase block mb-1">Creditor / Office Entity</label>
                 <input
                   type="text"
                   value={configCreditor}
                   onChange={(e) => setConfigCreditor(e.target.value)}
                   placeholder="e.g. Office Space Landlord"
-                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white text-xs outline-none focus:ring-2 focus:ring-amber-500"
+                  className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-surface px-4 py-2.5 text-zinc-900 dark:text-white text-xs outline-none focus:ring-2 focus:ring-amber-500"
                 />
               </div>
 
@@ -1492,13 +1490,13 @@ Logs Recorded: ${payments.length} installments`;
                 <button
                   type="button"
                   onClick={() => setIsConfigOpen(false)}
-                  className="flex-1 py-2.5 rounded-xl font-bold text-xs bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
+                  className="flex-1 py-2.5 rounded-surface font-bold text-xs bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 rounded-xl font-bold text-xs bg-amber-500 text-white shadow-md shadow-amber-500/20"
+                  className="flex-1 py-2.5 rounded-surface font-bold text-xs bg-amber-500 text-white "
                 >
                   Save Settings
                 </button>
