@@ -1,0 +1,136 @@
+{
+  "entities": {
+    "user": {
+      "title": "User Profile",
+      "description": "User account settings and active vault pointer",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "displayName": { "type": "string" },
+        "email": { "type": "string" },
+        "activeVaultId": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["uid"]
+    },
+    "category": {
+      "title": "Category Goal",
+      "description": "Savings goal category target and current saved sum",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "targetAmount": { "type": "number" },
+        "currentAmount": { "type": "number" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "name", "targetAmount", "currentAmount"]
+    },
+    "entry": {
+      "title": "Savings Entry",
+      "description": "Individual deposit transaction toward a goal with depositor attribution",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "categoryId": { "type": "string" },
+        "amount": { "type": "number" },
+        "date": { "type": "string" },
+        "note": { "type": "string" },
+        "createdAt": { "type": "number" },
+        "userId": { "type": "string" },
+        "depositorName": { "type": "string" },
+        "depositorRole": { "type": "string" },
+        "vaultId": { "type": "string" }
+      },
+      "required": ["id", "categoryId", "amount", "date", "createdAt"]
+    },
+    "debt": {
+      "title": "Office Debt Goal",
+      "description": "Debt tracking configuration and payoff status",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "totalDebt": { "type": "number" },
+        "paidAmount": { "type": "number" },
+        "dailyMinimum": { "type": "number" },
+        "creditorName": { "type": "string" },
+        "description": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "name", "totalDebt", "paidAmount", "dailyMinimum"]
+    },
+    "debt_payment": {
+      "title": "Debt Payment Entry",
+      "description": "Individual payment toward the office debt balance",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "amount": { "type": "number" },
+        "date": { "type": "string" },
+        "paymentMethod": { "type": "string" },
+        "note": { "type": "string" },
+        "sourceAccount": { "type": "string" },
+        "deductFromVault": { "type": "boolean" },
+        "createdAt": { "type": "number" },
+        "userId": { "type": "string" }
+      },
+      "required": ["id", "amount", "date", "createdAt"]
+    },
+    "vault": {
+      "title": "Joint Vault / Shared Account",
+      "description": "Shared savings account accessible by two or more partners (e.g. husband and wife)",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "code": { "type": "string" },
+        "createdById": { "type": "string" },
+        "createdByName": { "type": "string" },
+        "partner1Name": { "type": "string" },
+        "partner2Name": { "type": "string" },
+        "members": {
+          "type": "array",
+          "description": "List of user UIDs who have access to this shared vault"
+        },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "name", "code", "createdById", "members"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/user" },
+      "description": "User profile document"
+    },
+    "/users/{userId}/categories/{categoryId}": {
+      "schema": { "$ref": "#/entities/category" },
+      "description": "Personal budget categories"
+    },
+    "/users/{userId}/entries/{entryId}": {
+      "schema": { "$ref": "#/entities/entry" },
+      "description": "Personal savings entries"
+    },
+    "/users/{userId}/debt/{debtId}": {
+      "schema": { "$ref": "#/entities/debt" },
+      "description": "Office debt tracking configuration"
+    },
+    "/users/{userId}/debt_payments/{paymentId}": {
+      "schema": { "$ref": "#/entities/debt_payment" },
+      "description": "Office debt installment payments"
+    },
+    "/vaults/{vaultId}": {
+      "schema": { "$ref": "#/entities/vault" },
+      "description": "Joint vault meta document with member list"
+    },
+    "/vaults/{vaultId}/categories/{categoryId}": {
+      "schema": { "$ref": "#/entities/category" },
+      "description": "Shared vault categories"
+    },
+    "/vaults/{vaultId}/entries/{entryId}": {
+      "schema": { "$ref": "#/entities/entry" },
+      "description": "Shared vault savings entries"
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Vault",
+  "description": "Smart UGX budgeting and savings tracker for Home Rent, Internet, and Work Rent commitments with real-time multi-device cloud synchronization.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
